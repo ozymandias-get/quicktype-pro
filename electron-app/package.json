@@ -53,7 +53,8 @@
             "allowToChangeInstallationDirectory": true,
             "installerIcon": "public/icon.ico",
             "uninstallerIcon": "public/icon.ico"
-        }
+        },
+        "publish": null
     },
     "keywords": [
         "quicktype",
