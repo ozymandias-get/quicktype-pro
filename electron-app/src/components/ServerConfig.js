@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { t } from '../i18n/translations';
 
-function ServerConfig({ serverUrl, isConnected, onConnect }) {
+function ServerConfig({ serverUrl, isConnected, onConnect, language = 'en' }) {
     const [url, setUrl] = useState(serverUrl);
     const [isEditing, setIsEditing] = useState(false);
 
@@ -32,7 +33,6 @@ function ServerConfig({ serverUrl, isConnected, onConnect }) {
                         </svg>
                         <span style={{ fontSize: '13px', color: '#94a3b8' }}>{serverUrl}</span>
                     </div>
-                    <span style={{ fontSize: '11px', color: '#64748b' }}>Değiştirmek için tıkla</span>
                 </div>
             </div>
         );
@@ -41,7 +41,7 @@ function ServerConfig({ serverUrl, isConnected, onConnect }) {
     return (
         <div className="glass-panel server-config">
             <div style={{ marginBottom: '8px', fontSize: '12px', color: '#94a3b8' }}>
-                Sunucu Adresi
+                {t('serverAddress', language)}
             </div>
             <div className="server-input-group">
                 <input
@@ -58,7 +58,7 @@ function ServerConfig({ serverUrl, isConnected, onConnect }) {
                     onClick={handleConnect}
                     disabled={!url.trim()}
                 >
-                    Bağlan
+                    {t('connect', language)}
                 </button>
             </div>
         </div>

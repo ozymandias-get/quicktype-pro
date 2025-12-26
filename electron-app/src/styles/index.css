@@ -1,12 +1,18 @@
 /* QuickType Pro Desktop - Ana Stil Dosyası */
 
-:root {
+/* ==================== TEMA DEĞİŞKENLERİ ==================== */
+
+/* Koyu Tema (Varsayılan) */
+:root,
+[data-theme="dark"] {
     /* Renkler - Pure Black Theme */
     --deep-space: #000000;
     --space-blue: #080808;
     --glass-bg: rgba(15, 15, 15, 0.85);
     --glass-border: rgba(255, 255, 255, 0.06);
     --glass-hover: rgba(255, 255, 255, 0.1);
+    --app-bg: #000000;
+    --panel-bg: rgba(18, 18, 18, 0.95);
 
     /* Gradient Renkler */
     --gradient-blue: linear-gradient(135deg, #3b82f6, #2563eb);
@@ -23,6 +29,48 @@
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
     --shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
     --shadow-glow-emerald: 0 0 20px rgba(16, 185, 129, 0.3);
+
+    /* Input ve scrollbar */
+    --input-bg: rgba(20, 20, 20, 0.9);
+    --scrollbar-track: rgba(10, 10, 10, 0.5);
+    --scrollbar-thumb: rgba(59, 130, 246, 0.3);
+
+    /* Geçişler */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Açık Tema */
+[data-theme="light"] {
+    /* Renkler - Light Theme */
+    --deep-space: #f8fafc;
+    --space-blue: #f1f5f9;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-hover: rgba(0, 0, 0, 0.05);
+    --app-bg: #f8fafc;
+    --panel-bg: rgba(255, 255, 255, 0.95);
+
+    /* Gradient Renkler (aynı) */
+    --gradient-blue: linear-gradient(135deg, #3b82f6, #2563eb);
+    --gradient-purple: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    --gradient-emerald: linear-gradient(135deg, #10b981, #059669);
+    --gradient-rose: linear-gradient(135deg, #f43f5e, #e11d48);
+
+    /* Metin Renkleri */
+    --text-primary: #1e293b;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+
+    /* Gölgeler */
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.15);
+    --shadow-glow-emerald: 0 0 20px rgba(16, 185, 129, 0.15);
+
+    /* Input ve scrollbar */
+    --input-bg: rgba(241, 245, 249, 0.9);
+    --scrollbar-track: rgba(241, 245, 249, 0.5);
+    --scrollbar-thumb: rgba(59, 130, 246, 0.4);
 
     /* Geçişler */
     --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
@@ -61,11 +109,12 @@ body {
     min-width: 100vw;
     display: flex;
     flex-direction: column;
-    background: #000000;
+    background: var(--app-bg, #000000);
     overflow: hidden;
     position: relative;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
+    transition: background-color 0.3s ease;
 }
 
 /* Arka Plan Orb'ları - Gizlendi (Pure Black Theme) */
@@ -1007,4 +1056,1102 @@ body {
     to {
         opacity: 1;
     }
+}
+
+/* ==================== SETTINGS MODAL ==================== */
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.settings-modal {
+    width: 100%;
+    max-width: 400px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 24px;
+    overflow: hidden;
+    animation: popupSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    margin: 20px;
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.settings-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.settings-back-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+
+.settings-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.settings-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.settings-section {
+    margin-bottom: 24px;
+}
+
+/* Settings Menu Item - Accordion Toggle */
+.settings-menu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.settings-menu-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.settings-menu-item.expanded {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.settings-menu-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #60a5fa;
+    flex-shrink: 0;
+}
+
+.settings-menu-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+.settings-menu-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.settings-menu-value {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.settings-menu-arrow {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.3s ease;
+}
+
+.settings-menu-arrow.rotated {
+    transform: rotate(180deg);
+    color: #60a5fa;
+}
+
+/* Language Dropdown */
+.language-dropdown {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.language-dropdown.open {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 12px;
+}
+
+.language-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 8px;
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.language-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.language-option.active {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.12));
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.language-flag {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.language-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+.language-option .check-icon {
+    color: #10b981;
+}
+
+/* ==================== LANGUAGE SETUP (First Run) - Minimal Design ==================== */
+.language-setup-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+    overflow: hidden;
+}
+
+.language-setup-container {
+    width: 100%;
+    max-width: 380px;
+    padding: 40px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Minimal Header */
+.setup-header-minimal {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.setup-title-minimal {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.5px;
+    margin: 0 0 8px 0;
+}
+
+.setup-subtitle-minimal {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    letter-spacing: 0.3px;
+}
+
+/* Language Buttons - 3D Glass */
+.setup-languages {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.setup-language-btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* Glass effect with 3D depth */
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.08) 0%,
+            rgba(255, 255, 255, 0.03) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    /* 3D shadow effect */
+    box-shadow:
+        0 4px 16px rgba(0, 0, 0, 0.4),
+        0 1px 0 rgba(255, 255, 255, 0.05) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.2) inset;
+
+    animation: btnSlideIn 0.4s ease-out both;
+}
+
+@keyframes btnSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.setup-language-btn:hover {
+    background: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(255, 255, 255, 0.06) 100%);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.5),
+        0 1px 0 rgba(255, 255, 255, 0.1) inset,
+        0 -1px 0 rgba(0, 0, 0, 0.2) inset;
+}
+
+.setup-language-btn:active {
+    transform: translateY(0px);
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.4),
+        0 1px 0 rgba(255, 255, 255, 0.05) inset;
+}
+
+.setup-language-btn .lang-flag {
+    font-size: 28px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.setup-language-btn .lang-name {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.2px;
+}
+
+.setup-language-btn .lang-arrow {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.4);
+    transition: all 0.25s ease;
+}
+
+.setup-language-btn:hover .lang-arrow {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    transform: translateX(3px);
+}
+
+/* Header Settings Button */
+.header-settings-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    margin-left: 8px;
+}
+
+.header-settings-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    transform: rotate(45deg);
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ==================== ANİMASYONLAR ==================== */
+
+/* Fade-out animasyonu (silme) */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-20px) scale(0.95);
+    }
+}
+
+/* Yeni öğe highlight animasyonu */
+@keyframes highlightPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        border-color: rgba(16, 185, 129, 0.5);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        border-color: var(--glass-border);
+    }
+}
+
+/* Bağlantı durumu pulse efekti */
+@keyframes connectionPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+    }
+
+    100% {
+        box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+}
+
+.status-badge.connected .status-dot {
+    animation: connectionPulse 1.5s ease-out infinite;
+}
+
+/* ==================== CLIPBOARD ITEM WRAPPER ==================== */
+.clipboard-item-wrapper {
+    position: relative;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.clipboard-item-wrapper.deleting {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+.clipboard-item-wrapper.new-item .clipboard-item {
+    animation: highlightPulse 2s ease-out;
+    border-color: rgba(16, 185, 129, 0.5);
+}
+
+/* Swipe Delete Background */
+.swipe-delete-bg {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 150px;
+    background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.2));
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 20px;
+    gap: 8px;
+    color: #f87171;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 0 14px 14px 0;
+    z-index: -1;
+}
+
+.swipe-delete-bg svg {
+    opacity: 0.8;
+}
+
+/* ==================== BAĞLANTI HATASI PANELİ ==================== */
+.connection-error-panel {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    margin-top: 10px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 14px;
+}
+
+.connection-error-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(239, 68, 68, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f87171;
+    flex-shrink: 0;
+}
+
+.connection-error-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.connection-error-text .error-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fca5a5;
+}
+
+.connection-error-text .error-message {
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.4;
+}
+
+/* Retry Butonu */
+.retry-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #fca5a5;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.retry-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.2));
+    border-color: rgba(239, 68, 68, 0.5);
+    transform: translateY(-1px);
+}
+
+.retry-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.retry-btn.retrying {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #93c5fd;
+}
+
+.retry-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(147, 197, 253, 0.3);
+    border-top-color: #93c5fd;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* ==================== BAŞLANGIÇ AYARLARI STİLLERİ ==================== */
+.startup-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px;
+}
+
+.startup-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+.startup-option:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.startup-option-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.startup-option-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.startup-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.startup-option-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.startup-option-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* ==================== DOSYA YÜKLEME PROGRESS BAR ==================== */
+.upload-progress-container {
+    width: 100%;
+    margin-top: 12px;
+}
+
+.upload-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.upload-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.upload-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid rgba(99, 102, 241, 0.2);
+    border-top-color: #818cf8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 8px;
+}
+
+.file-drop-zone.uploading {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.4);
+    pointer-events: none;
+}
+
+/* ==================== PULL TO REFRESH ==================== */
+.pull-to-refresh-indicator {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    background: linear-gradient(180deg, rgba(59, 130, 246, 0.1), transparent);
+    transform: translateY(-100%);
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    z-index: 100;
+}
+
+.pull-to-refresh-indicator.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.pull-to-refresh-indicator.refreshing {
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.1), transparent);
+}
+
+.pull-indicator-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-secondary);
+    font-size: 13px;
+}
+
+.pull-indicator-icon {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.3s ease;
+}
+
+.pull-to-refresh-indicator.ready .pull-indicator-icon {
+    transform: rotate(180deg);
+}
+
+.pull-to-refresh-indicator.refreshing .pull-indicator-icon {
+    animation: spin 1s linear infinite;
+}
+
+/* ==================== TEMA İKONU STİLİ ==================== */
+.settings-menu-icon.theme-icon {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15));
+    color: #fbbf24;
+}
+
+.settings-menu-icon.startup-icon {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
+    color: #34d399;
+}
+
+/* ==================== BAĞLANTI DURUMU GÜNCELLEMESİ ==================== */
+.status-badge {
+    transition: all 0.3s ease;
+}
+
+.status-badge.reconnecting {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+.status-badge.reconnecting .status-dot {
+    background: #fbbf24;
+    box-shadow: 0 0 8px rgba(251, 191, 36, 0.8);
+    animation: pulse 0.5s ease-in-out infinite;
+}
+
+/* ==================== AÇIK TEMA ÖZEL STİLLERİ ==================== */
+[data-theme="light"] .glass-panel {
+    background: var(--panel-bg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .text-input {
+    background: var(--input-bg);
+}
+
+[data-theme="light"] .server-input {
+    background: var(--input-bg);
+}
+
+[data-theme="light"] .toggle-switch {
+    background: rgba(203, 213, 225, 0.9);
+}
+
+[data-theme="light"] .settings-menu-item {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .settings-menu-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .language-option {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .startup-option {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .header-settings-btn {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .header-settings-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+}
+
+/* ==================== AÇIK TEMA METİN RENKLERİ ==================== */
+/* Settings Modal */
+[data-theme="light"] .settings-modal {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+[data-theme="light"] .settings-overlay {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .settings-menu-label {
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .settings-menu-value {
+    color: var(--text-secondary);
+}
+
+[data-theme="light"] .settings-menu-arrow {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-muted);
+}
+
+[data-theme="light"] .settings-menu-arrow.rotated {
+    color: #2563eb;
+}
+
+[data-theme="light"] .settings-menu-item.expanded {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: rgba(59, 130, 246, 0.15);
+}
+
+[data-theme="light"] .settings-back-btn {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+}
+
+[data-theme="light"] .settings-back-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+}
+
+/* Language Options */
+[data-theme="light"] .language-option:hover {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .language-name {
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .language-option.active {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(5, 150, 105, 0.08));
+    border-color: rgba(16, 185, 129, 0.25);
+}
+
+/* Startup Options */
+[data-theme="light"] .startup-option:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .startup-option-label {
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .startup-option-desc {
+    color: var(--text-secondary);
+}
+
+/* Toast Messages */
+[data-theme="light"] .toast {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Popup Modal */
+[data-theme="light"] .popup-modal-overlay {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .popup-modal {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+[data-theme="light"] .popup-text {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+/* Toggle Switch Light Theme */
+[data-theme="light"] .toggle-switch::after {
+    background: var(--text-muted);
+}
+
+/* Server Config */
+[data-theme="light"] .server-status-text {
+    color: var(--text-secondary);
+}
+
+/* Clipboard Item Buttons Hover */
+[data-theme="light"] .clipboard-item-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+/* ==================== GÜNCELLEME BÖLÜMÜ STİLLERİ ==================== */
+
+/* Update Icon */
+.settings-menu-icon.update-icon {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15));
+    color: #a78bfa;
+}
+
+/* Update Options Container */
+.update-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px;
+}
+
+/* Update Info Row */
+.update-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.update-info-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.update-info-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-family: 'SF Mono', Monaco, 'Consolas', monospace;
+}
+
+.update-info-value.update-new {
+    color: #10b981;
+}
+
+/* Update Progress */
+.update-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(139, 92, 246, 0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+.update-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.update-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b5cf6, #a78bfa);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.update-progress-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #a78bfa;
+    min-width: 40px;
+    text-align: right;
+}
+
+/* Update Messages */
+.update-error-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 10px;
+    color: #f87171;
+    font-size: 13px;
+}
+
+.update-success-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 10px;
+    color: #34d399;
+    font-size: 13px;
+}
+
+/* Update Actions */
+.update-actions {
+    margin-top: 8px;
+}
+
+.update-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    border: none;
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15));
+    color: #a78bfa;
+    border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.update-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(124, 58, 237, 0.25));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+}
+
+.update-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.update-btn.checking {
+    pointer-events: none;
+}
+
+.update-btn-install {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+.update-btn-install:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+/* Update Spinner */
+.update-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(167, 139, 250, 0.3);
+    border-top-color: #a78bfa;
+    border-radius: 50%;
+    animation: updateSpin 0.8s linear infinite;
+}
+
+@keyframes updateSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Update Status Text Colors */
+.settings-menu-value.update-ready {
+    color: #10b981 !important;
+}
+
+.settings-menu-value.update-error-text {
+    color: #f87171 !important;
+}
+
+/* ==================== AÇIK TEMA - GÜNCELLEME STİLLERİ ==================== */
+[data-theme="light"] .update-info-row {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .update-info-label {
+    color: var(--text-secondary);
+}
+
+[data-theme="light"] .update-info-value {
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .update-progress {
+    background: rgba(139, 92, 246, 0.06);
+    border-color: rgba(139, 92, 246, 0.12);
+}
+
+[data-theme="light"] .update-progress-bar {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .update-error-message {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="light"] .update-success-message {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.15);
+}
+
+[data-theme="light"] .update-btn {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1));
+    border-color: rgba(139, 92, 246, 0.2);
 }

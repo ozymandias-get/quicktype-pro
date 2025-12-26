@@ -9,6 +9,7 @@ import { initTouchpad } from './touchpad.js';
 import { initClipboard } from './clipboard.js';
 import { initTabs } from './tabs.js';
 import { showToast } from './utils.js';
+import { updatePageContent, getLanguage } from './i18n.js';
 
 /**
  * DOM elementlerini toplar
@@ -57,10 +58,17 @@ function getElements() {
 function initApp() {
     const elements = getElements();
 
+    // Dil ayarlarını uygula
+    updatePageContent();
+
     // Socket bağlantısını başlat
     initSocketEvents(elements, () => {
         // Bağlantı kurulduğunda
         resetShiftState();
+
+        // Mevcut dili sunucuya bildir
+        const currentLang = getLanguage();
+        socket.emit('language_change', { language: currentLang });
 
         // Klavye açıksa focus
         if (elements.input && document.getElementById('view-keyboard')?.classList.contains('active')) {

@@ -9,9 +9,12 @@
  * - Constants ile magic number'lar elimine edildi
  * - Singleton pattern ile tekrar başlatma koruması
  * - PWA arka plan/ön plan yönetimi
+ * - Dil senkronizasyonu
  */
 
 import { showToast } from './utils.js';
+import { setLanguage, updatePageContent, getLanguage } from './i18n.js';
+
 
 // ==================== CONSTANTS ====================
 const SOCKET_CONFIG = {
@@ -339,6 +342,19 @@ export function initSocketEvents(elements, onConnected) {
     registerHandler('connect_error', (error) => {
         console.log('⚠️ Bağlantı hatası:', error?.message || 'Bilinmeyen hata');
         updateStatusIndicator('connecting');
+    });
+
+    // Language changed handler - dil senkronizasyonu
+    registerHandler('language_changed', (data) => {
+        if (data && data.language) {
+            const currentLang = getLanguage();
+            if (data.language !== currentLang) {
+                console.log(`🌐 Dil değişikliği alındı: ${data.language}`);
+                setLanguage(data.language);
+                updatePageContent();
+                showDebouncedToast('Language changed!', 'info');
+            }
+        }
     });
 
     // PWA visibility handler

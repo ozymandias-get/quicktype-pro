@@ -1,9 +1,10 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { t } from '../i18n/translations';
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const MAX_FILES_AT_ONCE = 5;
 
-function FileUpload({ onUpload, showToast }) {
+function FileUpload({ onUpload, showToast, language = 'en' }) {
     const [isDragOver, setIsDragOver] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -33,19 +34,19 @@ function FileUpload({ onUpload, showToast }) {
 
         // Maksimum dosya sayısı kontrolü
         if (files.length > MAX_FILES_AT_ONCE) {
-            showToast?.(`En fazla ${MAX_FILES_AT_ONCE} dosya yükleyebilirsiniz`, 'error');
+            showToast?.(`Max ${MAX_FILES_AT_ONCE} files allowed`, 'error');
         }
 
         files.slice(0, MAX_FILES_AT_ONCE).forEach(file => {
             // Boyut kontrolü
             if (file.size > MAX_FILE_SIZE) {
-                showToast?.(`${file.name} çok büyük (max 50MB)`, 'error');
+                showToast?.(`${file.name} is too large (max 50MB)`, 'error');
                 return;
             }
 
             // Boş dosya kontrolü
             if (file.size === 0) {
-                showToast?.(`${file.name} boş dosya`, 'error');
+                showToast?.(`${file.name} is empty`, 'error');
                 return;
             }
 
@@ -81,47 +82,13 @@ function FileUpload({ onUpload, showToast }) {
         setIsUploading(true);
         setUploadProgress(0);
 
-        const totalFiles = files.length;
-        let completed = 0;
-
-        for (const file of files) {
-            try {
-                await uploadSingleFile(file);
-                completed++;
-                setUploadProgress(Math.round((completed / totalFiles) * 100));
-            } catch (error) {
-                showToast?.(`${file.name} yüklenemedi`, 'error');
-            }
+        // Dosyaları doğrudan parent'a gönder (File dizisi olarak)
+        if (onUpload) {
+            onUpload(files);
         }
 
         setIsUploading(false);
         setUploadProgress(0);
-    };
-
-    const uploadSingleFile = (file) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
-                try {
-                    const base64 = e.target.result.split(',')[1];
-                    const contentType = file.type.startsWith('image/') ? 'image' : 'file';
-
-                    onUpload({
-                        content: base64,
-                        content_type: contentType,
-                        filename: file.name
-                    });
-
-                    resolve();
-                } catch (error) {
-                    reject(error);
-                }
-            };
-
-            reader.onerror = () => reject(new Error('Dosya okunamadı'));
-            reader.readAsDataURL(file);
-        });
     };
 
     return (
@@ -136,7 +103,7 @@ function FileUpload({ onUpload, showToast }) {
                 {isUploading ? (
                     <>
                         <div className="upload-spinner"></div>
-                        <div className="file-drop-text">Yükleniyor... {uploadProgress}%</div>
+                        <div className="file-drop-text">Uploading... {uploadProgress}%</div>
                         <div className="upload-progress-bar">
                             <div
                                 className="upload-progress-fill"
@@ -153,8 +120,8 @@ function FileUpload({ onUpload, showToast }) {
                                 <line x1="12" y1="3" x2="12" y2="15"></line>
                             </svg>
                         </div>
-                        <div className="file-drop-text">Dosya yüklemek için tıkla veya sürükle</div>
-                        <div className="file-drop-hint">Resim, PDF, vb. (max 50MB)</div>
+                        <div className="file-drop-text">{t('tapToUploadFile', language)}</div>
+                        <div className="file-drop-hint">{t('imagesPdfEtc', language)}</div>
                     </>
                 )}
             </div>

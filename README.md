@@ -2,99 +2,107 @@
 
 # ⌨️ QuickType Pro
 
-**Telefonunuzdan bilgisayarınızı kontrol edin**
+**Control your computer from your phone**
 
 ![Version](https://img.shields.io/badge/version-2.1--secure-blue)
 ![Python](https://img.shields.io/badge/python-3.8+-green)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-orange)
 
-*PC için Electron masaüstü uygulaması ve mobil cihazlar için web arayüzü*
+*Electron desktop app for PC and web interface for mobile devices*
+
+---
+
+### 🌍 Languages / Diller / Sprachen
+
+[🇬🇧 English](README.md) | [🇹🇷 Türkçe](README.tr.md) | [🇩🇪 Deutsch](README.de.md) | [🇫🇷 Français](README.fr.md) | [🇪🇸 Español](README.es.md) | [🇨🇳 中文](README.zh.md)
+
+---
 
 </div>
 
----
+## ✨ Features
 
-## ✨ Özellikler
-
-| Özellik | 📱 Mobil | 🖥️ PC (Electron) |
+| Feature | 📱 Mobile | 🖥️ PC (Electron) |
 |---------|:--------:|:----------------:|
-| ⌨️ Uzak Klavye | ✅ | ❌ |
+| ⌨️ Remote Keyboard | ✅ | ❌ |
 | 🖱️ Touchpad/Mouse | ✅ | ❌ |
-| 📋 Pano Senkronizasyonu | ✅ | ✅ |
-| 📁 Dosya Paylaşımı | ✅ | ✅ |
+| 📋 Clipboard Sync | ✅ | ✅ |
+| 📁 File Sharing | ✅ | ✅ |
 | 🔄 System Tray | ❌ | ✅ |
+| 🌓 Dark/Light Theme | ✅ | ✅ |
+| 🌍 Multi-language | ✅ | ✅ |
 
 ---
 
-## 📸 Ekran Görüntüleri
+## 📸 Screenshots
 
-### 🖥️ Electron Desktop Uygulaması
+### 🖥️ Electron Desktop Application
 
 <div align="center">
 <img src="screenshots/electron-app.png" alt="Electron Desktop App" width="350"/>
 </div>
 
-### 📱 Mobil Web Arayüzü
+### 📱 Mobile Web Interface
 
 <div align="center">
 <table>
 <tr>
-<td align="center"><img src="screenshots/mobile-keyboard.png" alt="Klavye" width="200"/><br/><b>Klavye</b></td>
+<td align="center"><img src="screenshots/mobile-keyboard.png" alt="Keyboard" width="200"/><br/><b>Keyboard</b></td>
 <td align="center"><img src="screenshots/mobile-touchpad.png" alt="Touchpad" width="200"/><br/><b>Touchpad</b></td>
 </tr>
 <tr>
-<td align="center"><img src="screenshots/mobile-keys.png" alt="Özel Tuşlar" width="200"/><br/><b>Özel Tuşlar</b></td>
-<td align="center"><img src="screenshots/mobile-clipboard.png" alt="Pano" width="200"/><br/><b>Pano</b></td>
+<td align="center"><img src="screenshots/mobile-keys.png" alt="Special Keys" width="200"/><br/><b>Special Keys</b></td>
+<td align="center"><img src="screenshots/mobile-clipboard.png" alt="Clipboard" width="200"/><br/><b>Clipboard</b></td>
 </tr>
 </table>
 </div>
 
 ---
 
-## 🔒 Güvenlik
+## 🔒 Security
 
-Bu uygulama yerel ağınızda çalışmak üzere tasarlanmıştır:
+This application is designed to work on your local network:
 
-- ✅ Rate limiting (DDoS koruması)
-- ✅ Input sanitization (Girdi doğrulama)
-- ✅ Path traversal koruması
-- ✅ Bağlantı loglama
-- ✅ Güvenlik başlıkları (CSP, XSS, vb.)
+- ✅ Rate limiting (DDoS protection)
+- ✅ Input sanitization
+- ✅ Path traversal protection
+- ✅ Connection logging
+- ✅ Security headers (CSP, XSS, etc.)
 
-> ⚠️ **Uyarı**: Bu uygulamayı yalnızca güvendiğiniz ağlarda kullanın!
+> ⚠️ **Warning**: Only use this application on trusted networks!
 
 ---
 
-## 🚀 Hızlı Başlangıç
+## 🚀 Quick Start
 
-### Gereksinimler
+### Requirements
 
 - Python 3.8+
-- Node.js 16+ (Electron için)
+- Node.js 16+ (for Electron)
 - Windows 10/11
 
-### Kurulum
+### Installation
 
 ```bash
-# 1. Repository'yi klonla
-git clone https://github.com/KULLANICI_ADINIZ/klavye.git
-cd klavye
+# 1. Clone the repository
+git clone https://github.com/ozymandias-get/quicktype-pro.git
+cd quicktype-pro
 
-# 2. Python bağımlılıklarını yükle
+# 2. Install Python dependencies
 pip install -r requirements.txt
 
-# 3. Backend'i başlat
+# 3. Start the backend
 python main.py
 ```
 
-### 📱 Mobil Erişim
+### 📱 Mobile Access
 
-1. Backend çalışırken terminalde IP adresini görüntüleyin
-2. Telefonunuzun tarayıcısından `http://[PC_IP]:8000` adresine gidin
-3. Tüm özellikleri kullanmaya başlayın!
+1. While the backend is running, note the IP address shown in the terminal
+2. Go to `http://[PC_IP]:8000` from your phone's browser
+3. Start using all features!
 
-### 🖥️ Electron (PC) Kurulumu
+### 🖥️ Electron (PC) Setup
 
 ```bash
 cd electron-app
@@ -104,11 +112,11 @@ npm start
 
 ---
 
-## 🔧 Geliştirici Modu
+## 🔧 Developer Mode
 
 ### Backend
 ```bash
-# Debug modunda başlat
+# Start in debug mode
 $env:LOG_LEVEL="DEBUG"
 python main.py
 ```
@@ -127,48 +135,48 @@ npm run dist
 
 ---
 
-## ⚙️ Yapılandırma
+## ⚙️ Configuration
 
-| Ortam Değişkeni | Varsayılan | Açıklama |
-|-----------------|------------|----------|
-| `LOG_LEVEL` | `INFO` | Log seviyesi (DEBUG, INFO, WARNING, ERROR) |
-| `CORS_ORIGINS` | `*` | İzin verilen CORS origin'leri |
+| Environment Variable | Default | Description |
+|---------------------|---------|-------------|
+| `LOG_LEVEL` | `INFO` | Log level (DEBUG, INFO, WARNING, ERROR) |
+| `CORS_ORIGINS` | `*` | Allowed CORS origins |
 
-### Örnek Yapılandırma
+### Example Configuration
 
 ```powershell
-# Sadece belirli IP'lerden erişime izin ver
+# Allow access only from specific IPs
 $env:CORS_ORIGINS="http://192.168.1.100:8000,http://192.168.1.101:8000"
 python main.py
 ```
 
 ---
 
-## 📦 Proje Yapısı
+## 📦 Project Structure
 
 ```
 📁 QuickType-Pro/
-├── 📄 main.py              # Python backend giriş noktası
-├── 📄 requirements.txt     # Python bağımlılıkları
-├── 📁 app/                 # Backend modülleri
-│   ├── config.py           # Yapılandırma
-│   ├── security.py         # Güvenlik fonksiyonları
+├── 📄 main.py              # Python backend entry point
+├── 📄 requirements.txt     # Python dependencies
+├── 📁 app/                 # Backend modules
+│   ├── config.py           # Configuration
+│   ├── security.py         # Security functions
 │   ├── middleware.py       # HTTP middleware
-│   ├── routes.py           # API endpoint'leri
-│   ├── controllers.py      # Klavye/Mouse kontrolü
-│   ├── socket_events.py    # WebSocket olayları
-│   └── clipboard_manager.py # Pano yönetimi
-├── 📁 static/              # Mobil web arayüzü
-├── 📁 electron-app/        # Desktop uygulaması
-└── 📁 uploads/             # Paylaşılan dosyalar
+│   ├── routes.py           # API endpoints
+│   ├── controllers.py      # Keyboard/Mouse control
+│   ├── socket_events.py    # WebSocket events
+│   └── clipboard_manager.py # Clipboard management
+├── 📁 static/              # Mobile web interface
+├── 📁 electron-app/        # Desktop application
+└── 📁 uploads/             # Shared files
 ```
 
 ---
 
-## 🐛 Sorun Giderme
+## 🐛 Troubleshooting
 
 <details>
-<summary><b>Backend başlamıyor</b></summary>
+<summary><b>Backend won't start</b></summary>
 
 ```bash
 pip install -r requirements.txt --upgrade
@@ -176,15 +184,15 @@ pip install -r requirements.txt --upgrade
 </details>
 
 <details>
-<summary><b>Bağlantı kurulamıyor</b></summary>
+<summary><b>Cannot connect</b></summary>
 
-1. Firewall'da 8000 portunu açın
-2. PC ve telefon aynı ağda mı kontrol edin
-3. Antivirüs yazılımını geçici olarak devre dışı bırakın
+1. Open port 8000 in your firewall
+2. Make sure PC and phone are on the same network
+3. Temporarily disable antivirus software
 </details>
 
 <details>
-<summary><b>Pano çalışmıyor (Windows)</b></summary>
+<summary><b>Clipboard not working (Windows)</b></summary>
 
 ```bash
 pip install pywin32 --upgrade
@@ -193,14 +201,14 @@ pip install pywin32 --upgrade
 
 ---
 
-## 📄 Lisans
+## 📄 License
 
-Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
 <div align="center">
 
-**QuickType Pro** ile ❤️ yapıldı
+Made with ❤️ using **QuickType Pro**
 
 </div>

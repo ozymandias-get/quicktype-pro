@@ -1,6 +1,7 @@
 import React from 'react';
+import { t } from '../i18n/translations';
 
-function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal }) {
+function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal, language = 'en', isNew = false }) {
     const isFromPhone = item.source === 'phone';
     const isText = item.content_type === 'text';
     const isImage = item.content_type === 'image';
@@ -12,8 +13,6 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal })
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
     };
-
-
 
     const handleItemClick = () => {
         // Tüm içerik türleri için kopyalama yap
@@ -33,6 +32,17 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal })
     const handleDownloadClick = (e) => {
         e.stopPropagation();
         // Download link açılacak
+    };
+
+    // Source label based on language
+    const getSourceLabel = () => {
+        if (isFromPhone) {
+            return language === 'tr' ? 'Telefon' :
+                language === 'de' ? 'Telefon' :
+                    language === 'fr' ? 'Téléphone' :
+                        language === 'es' ? 'Teléfono' : 'Phone';
+        }
+        return 'PC';
     };
 
     return (
@@ -56,7 +66,7 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal })
                             <line x1="12" y1="17" x2="12" y2="21"></line>
                         </svg>
                     )}
-                    <span>{isFromPhone ? 'Telefon' : 'PC'}</span>
+                    <span>{getSourceLabel()}</span>
                     <span className="clipboard-item-time">• {item.formatted_time}</span>
                 </div>
 
@@ -65,7 +75,7 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal })
                         <button
                             className="clipboard-item-btn copy"
                             onClick={handleCopyClick}
-                            title="PC'ye Kopyala"
+                            title={t('copy', language)}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -79,7 +89,7 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal })
                             <button
                                 className="clipboard-item-btn copy"
                                 onClick={handleCopyClick}
-                                title="Panoya Kopyala"
+                                title={t('copy', language)}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -91,7 +101,7 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal })
                                 download
                                 className="clipboard-item-btn download"
                                 onClick={handleDownloadClick}
-                                title="İndir"
+                                title={t('download', language)}
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -105,7 +115,7 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal })
                     <button
                         className="clipboard-item-btn delete"
                         onClick={handleDeleteClick}
-                        title="Sil"
+                        title={language === 'tr' ? 'Sil' : language === 'de' ? 'Löschen' : language === 'fr' ? 'Supprimer' : language === 'es' ? 'Eliminar' : 'Delete'}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="3 6 5 6 21 6"></polyline>
@@ -138,7 +148,7 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal })
                         )}
                     </div>
                     <div className="clipboard-item-file-info">
-                        <div className="clipboard-item-file-name">{item.filename || 'Dosya'}</div>
+                        <div className="clipboard-item-file-name">{item.filename || 'File'}</div>
                         <div className="clipboard-item-file-size">{formatFileSize(item.size)}</div>
                     </div>
                 </div>

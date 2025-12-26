@@ -420,3 +420,30 @@ async def clipboard_popup(sid: str, data: Any) -> None:
         logger.error(f"clipboard_popup hatası: {e}")
 
 
+@sio.event
+async def language_change(sid: str, data: Any) -> None:
+    """
+    Dil değişikliğini tüm bağlı cihazlara yayınla
+    Bu sayede PC'den veya telefondan yapılan dil değişikliği 
+    tüm cihazlarda senkronize olur
+    """
+    try:
+        if not isinstance(data, dict):
+            return
+        
+        language = data.get('language', 'en')
+        
+        # Desteklenen diller
+        supported_languages = ['en', 'tr', 'de', 'fr', 'es', 'zh']
+        
+        if language not in supported_languages:
+            logger.warning(f"Desteklenmeyen dil: {language}")
+            return
+        
+        # Gönderen dahil TÜM istemcilere dil değişikliğini bildir
+        await sio.emit('language_changed', {'language': language})
+        logger.info(f"Dil değişikliği yayınlandı: {language}")
+        
+    except Exception as e:
+        logger.error(f"language_change hatası: {e}")
+

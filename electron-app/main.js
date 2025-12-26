@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, dialog, globalShortcut } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const { spawn, exec } = require('child_process');
 const path = require('path');
@@ -37,7 +37,7 @@ function loadSettings() {
     } catch (e) {
         console.error('Ayarlar yüklenemedi:', e.message);
     }
-    return { autoLaunch: true, startMinimized: true }; // Varsayılan olarak aktif
+    return { autoLaunch: true, startMinimized: true, language: 'en', theme: 'dark' }; // Varsayılan değerler
 }
 
 /**
@@ -93,7 +93,60 @@ function isStartMinimizedEnabled() {
     return settings.startMinimized !== false; // Varsayılan true
 }
 
+/**
+ * Dil ayarını kaydet
+ * @param {string} language - Dil kodu (en, tr, de, fr, es, zh)
+ */
+function setLanguage(language) {
+    const supportedLanguages = ['en', 'tr', 'de', 'fr', 'es', 'zh'];
+    if (!supportedLanguages.includes(language)) {
+        console.warn('Desteklenmeyen dil:', language);
+        return false;
+    }
+
+    const settings = loadSettings();
+    settings.language = language;
+    saveSettings(settings);
+    console.log(`🌐 Dil ayarlandı: ${language}`);
+    return true;
+}
+
+/**
+ * Kayıtlı dili getir
+ */
+function getLanguage() {
+    const settings = loadSettings();
+    return settings.language || 'en'; // Varsayılan İngilizce
+}
+
+/**
+ * Tema ayarını kaydet
+ * @param {string} theme - Tema (dark, light, system)
+ */
+function setTheme(theme) {
+    const supportedThemes = ['dark', 'light', 'system'];
+    if (!supportedThemes.includes(theme)) {
+        console.warn('Desteklenmeyen tema:', theme);
+        return false;
+    }
+
+    const settings = loadSettings();
+    settings.theme = theme;
+    saveSettings(settings);
+    console.log(`🎨 Tema ayarlandı: ${theme}`);
+    return true;
+}
+
+/**
+ * Kayıtlı temayı getir
+ */
+function getTheme() {
+    const settings = loadSettings();
+    return settings.theme || 'dark'; // Varsayılan koyu tema
+}
+
 // ==================== PYTHON BACKEND YÖNETİMİ ====================
+
 
 /**
  * Python backend'in çalışıp çalışmadığını kontrol et
@@ -424,11 +477,16 @@ if (!gotTheLock) {
     app.whenReady().then(async () => {
         console.log('🚀 App ready, başlatılıyor...');
 
-        // İlk çalıştırmada auto-launch'ı varsayılan olarak aktif et
+        // İlk çalıştırmada varsayılan ayarları set et
         const settings = loadSettings();
         if (settings.autoLaunch === undefined) {
             setAutoLaunch(true);
             setStartMinimized(true);
+        }
+        // Dil ayarı yoksa varsayılan İngilizce (ilk çalıştırmada kurulum ekranı gösterilecek)
+        if (settings.language === undefined) {
+            // Dil henüz seçilmemiş - React tarafında LanguageSetup gösterilecek
+            console.log('🌐 İlk çalıştırma - dil seçimi bekliyor');
         }
 
         // --hidden argümanı ile başlatıldıysa
@@ -493,6 +551,66 @@ if (!gotTheLock) {
             if (mainWindow) mainWindow.hide();
         });
 
+        // IPC Handlers - Dil ayarları
+        ipcMain.handle('get-language', () => {
+            return getLanguage();
+        });
+
+        ipcMain.handle('set-language', (event, language) => {
+            return setLanguage(language);
+        });
+
+        // IPC Handlers - Tema ayarları
+        ipcMain.handle('get-theme', () => {
+            return getTheme();
+        });
+
+        ipcMain.handle('set-theme', (event, theme) => {
+            return setTheme(theme);
+        });
+
+        // IPC Handlers - Başlangıç ayarları
+        ipcMain.handle('get-auto-launch', () => {
+            return isAutoLaunchEnabled();
+        });
+
+        ipcMain.handle('set-auto-launch', (event, enabled) => {
+            setAutoLaunch(enabled);
+            return enabled;
+        });
+
+        ipcMain.handle('get-start-minimized', () => {
+            return isStartMinimizedEnabled();
+        });
+
+        ipcMain.handle('set-start-minimized', (event, enabled) => {
+            setStartMinimized(enabled);
+            return enabled;
+        });
+
+        // ==================== GLOBAL HOTKEY ====================
+        // Ctrl+Shift+Q ile uygulamayı aç/kapat
+        const toggleWindowShortcut = 'CommandOrControl+Shift+Q';
+
+        const registered = globalShortcut.register(toggleWindowShortcut, () => {
+            if (mainWindow) {
+                if (mainWindow.isVisible()) {
+                    mainWindow.hide();
+                    console.log('🔇 Pencere gizlendi (Global Hotkey)');
+                } else {
+                    mainWindow.show();
+                    mainWindow.focus();
+                    console.log('🪟 Pencere gösterildi (Global Hotkey)');
+                }
+            }
+        });
+
+        if (registered) {
+            console.log(`⌨️ Global hotkey kaydedildi: ${toggleWindowShortcut}`);
+        } else {
+            console.warn(`⚠️ Global hotkey kaydedilemedi: ${toggleWindowShortcut}`);
+        }
+
         app.on('activate', () => {
             if (BrowserWindow.getAllWindows().length === 0) {
                 createWindow();
@@ -513,6 +631,7 @@ app.on('window-all-closed', () => {
 
 app.on('before-quit', () => {
     isQuitting = true;
+    globalShortcut.unregisterAll(); // Global hotkey'leri temizle
     stopPythonBackend(); // Python'u kapat
 });
 
@@ -551,6 +670,13 @@ autoUpdater.on('update-available', (info) => {
 // Güncelleme yok
 autoUpdater.on('update-not-available', (info) => {
     console.log('✅ Uygulama güncel:', info.version);
+
+    if (mainWindow) {
+        mainWindow.webContents.send('update-not-available', {
+            version: info.version,
+            message: 'Uygulama güncel'
+        });
+    }
 });
 
 // İndirme ilerlemesi
@@ -596,16 +722,57 @@ autoUpdater.on('error', (error) => {
 
     if (mainWindow) {
         mainWindow.setProgressBar(-1);
+        mainWindow.webContents.send('update-error', { message: error.message });
     }
 });
 
-// IPC: Manuel güncelleme kontrolü
-ipcMain.on('check-for-updates', () => {
-    checkForUpdates();
+// ==================== GÜNCELLEME IPC HANDLER'LARI ====================
+
+// IPC: Uygulama versiyonu
+ipcMain.handle('get-app-version', () => {
+    return app.getVersion();
+});
+
+// IPC: Manuel güncelleme kontrolü (UI'dan tetiklenen)
+ipcMain.handle('check-for-updates-manual', async () => {
+    if (!app.isPackaged) {
+        console.log('⚠️ Development modunda güncelleme kontrolü atlandı');
+        return {
+            status: 'dev-mode',
+            message: 'Güncelleme kontrolü sadece production modunda çalışır'
+        };
+    }
+
+    console.log('🔄 Manuel güncelleme kontrolü başlatılıyor...');
+
+    if (mainWindow) {
+        mainWindow.webContents.send('update-checking');
+    }
+
+    try {
+        const result = await autoUpdater.checkForUpdates();
+        return {
+            status: 'checking',
+            currentVersion: app.getVersion(),
+            latestVersion: result?.updateInfo?.version
+        };
+    } catch (error) {
+        console.error('❌ Güncelleme kontrolü hatası:', error.message);
+        return {
+            status: 'error',
+            message: error.message
+        };
+    }
 });
 
 // IPC: Güncellemeyi yükle
 ipcMain.on('install-update', () => {
+    console.log('🔄 Güncelleme yükleniyor ve yeniden başlatılıyor...');
     isQuitting = true;
     autoUpdater.quitAndInstall(false, true);
+});
+
+// IPC: Eski check-for-updates (geri uyumluluk)
+ipcMain.on('check-for-updates', () => {
+    checkForUpdates();
 });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { t } from '../i18n/translations';
 
-function TextInput({ onSend, onSendPopup }) {
+function TextInput({ onSend, onSendPopup, language = 'en' }) {
     const [text, setText] = useState('');
 
     const handleSubmit = () => {
@@ -29,7 +30,7 @@ function TextInput({ onSend, onSendPopup }) {
             <div className="text-input-wrapper">
                 <textarea
                     className="text-input"
-                    placeholder="Metin ekle veya yapıştır... (Enter ile gönder, Shift+Enter yeni satır)"
+                    placeholder={t('addTextOrPaste', language)}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     onKeyDown={handleKeyDown}
@@ -39,7 +40,7 @@ function TextInput({ onSend, onSendPopup }) {
                     <button
                         className="popup-send-btn"
                         onClick={handlePopupSubmit}
-                        title="Pop-up olarak gönder"
+                        title={t('showAsPopup', language)}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
@@ -50,7 +51,7 @@ function TextInput({ onSend, onSendPopup }) {
                     <button
                         className="send-btn"
                         onClick={handleSubmit}
-                        title="Arşive kaydet (Enter)"
+                        title={t('saveToArchive', language)}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -64,5 +65,3 @@ function TextInput({ onSend, onSendPopup }) {
 }
 
 export default TextInput;
-
-

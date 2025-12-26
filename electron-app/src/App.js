@@ -10,16 +10,24 @@ import FileUpload from './components/FileUpload';
 import ClipboardList from './components/ClipboardList';
 import ServerConfig from './components/ServerConfig';
 import Toast from './components/Toast';
+import Settings from './components/Settings';
+import LanguageSetup from './components/LanguageSetup';
+
+// i18n
+import { t, defaultLanguage } from './i18n/translations';
 
 function App() {
     // Socket state
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
     const [serverUrl, setServerUrl] = useState('http://127.0.0.1:8000');
+    const [connectionError, setConnectionError] = useState(null);
+    const [isRetrying, setIsRetrying] = useState(false);
 
     // Clipboard state
     const [clipboardItems, setClipboardItems] = useState([]);
     const [clipboardEnabled, setClipboardEnabled] = useState(true);
+    const [newItemIds, setNewItemIds] = useState(new Set()); // Yeni eklenen öğeler için highlight
 
     // Toast state
     const [toast, setToast] = useState(null);
@@ -31,14 +39,133 @@ function App() {
     const [clearConfirm, setClearConfirm] = useState(false);
     const clearTimeoutRef = useRef(null);
 
+    // Settings state
+    const [settingsOpen, setSettingsOpen] = useState(false);
+
+    // Theme state
+    const [theme, setTheme] = useState(() => {
+        return localStorage.getItem('quicktype_theme') || 'dark';
+    });
+
+    // Language state
+    const [language, setLanguage] = useState(() => {
+        return localStorage.getItem('quicktype_language') || null;
+    });
+    const [showLanguageSetup, setShowLanguageSetup] = useState(false);
+
+    // Pull to refresh state
+    const [isPulling, setIsPulling] = useState(false);
+    const [pullDistance, setPullDistance] = useState(0);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
     // Refs
     const socketRef = useRef(null);
+    const mainContentRef = useRef(null);
+    const languageRef = useRef(language);
+
+    // Dil değiştiğinde ref'i güncelle (callback'ler için)
+    useEffect(() => {
+        languageRef.current = language;
+    }, [language]);
+
+    // Tema uygula
+    const applyTheme = useCallback((themeName) => {
+        document.documentElement.setAttribute('data-theme', themeName);
+        if (themeName === 'system') {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        }
+    }, []);
+
+    // İlk yüklemede dil ve tema kontrolü
+    useEffect(() => {
+        const initApp = async () => {
+            let savedLang = localStorage.getItem('quicktype_language');
+
+            // LocalStorage'da yoksa Electron'dan (diskten) okumayı dene
+            if (!savedLang && window.electronAPI?.getLanguage) {
+                try {
+                    const electronLang = await window.electronAPI.getLanguage();
+                    if (electronLang) {
+                        savedLang = electronLang;
+                        localStorage.setItem('quicktype_language', savedLang);
+                        console.log('Language synced from Electron:', savedLang);
+                    }
+                } catch (e) {
+                    console.error('Failed to sync language from Electron:', e);
+                }
+            }
+
+            if (!savedLang) {
+                setShowLanguageSetup(true);
+            } else {
+                setLanguage(savedLang);
+            }
+        };
+
+        initApp();
+
+        // Tema yükle
+        const savedTheme = localStorage.getItem('quicktype_theme') || 'dark';
+        setTheme(savedTheme);
+        applyTheme(savedTheme);
+    }, [applyTheme]);
+
+    // Tema değişikliği
+    const handleThemeChange = useCallback((newTheme) => {
+        setTheme(newTheme);
+        localStorage.setItem('quicktype_theme', newTheme);
+        applyTheme(newTheme);
+        window.electronAPI?.setTheme?.(newTheme);
+    }, [applyTheme]);
 
     // Toast göster
     const showToast = useCallback((message, type = 'info') => {
         setToast({ message, type });
         setTimeout(() => setToast(null), 2500);
     }, []);
+
+    // Dil değişikliği
+    const handleLanguageChange = useCallback((langCode) => {
+        setLanguage(langCode);
+        localStorage.setItem('quicktype_language', langCode);
+
+        // Socket üzerinden dil değişikliğini yayınla
+        if (socketRef.current && socketRef.current.connected) {
+            socketRef.current.emit('language_change', { language: langCode });
+        }
+
+        showToast(t('languageChanged', langCode), 'success');
+    }, [showToast]);
+
+    // Language setup tamamlandığında
+    const handleLanguageSetupComplete = useCallback((langCode) => {
+        handleLanguageChange(langCode);
+        setShowLanguageSetup(false);
+    }, [handleLanguageChange]);
+
+    // Retry bağlantı - socket connector'ı kullan
+    const handleRetry = useCallback(() => {
+        setIsRetrying(true);
+        setConnectionError(null);
+
+        // Socket'i yeniden bağla
+        if (socketRef.current) {
+            socketRef.current.connect();
+        }
+
+        setTimeout(() => setIsRetrying(false), 3000);
+    }, []);
+
+    // Yeni eklenen öğeler için highlight temizle
+    useEffect(() => {
+        if (newItemIds.size > 0) {
+            const timer = setTimeout(() => {
+                setNewItemIds(new Set());
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [newItemIds]);
 
     // Socket bağlantısı kur
     const connectToServer = useCallback((url) => {
@@ -61,14 +188,27 @@ function App() {
 
         newSocket.on('connect', () => {
             setIsConnected(true);
-            showToast('Sunucuya bağlandı!', 'success');
+            setConnectionError(null);
+            setIsRetrying(false);
+
+            // Ref kullanarak güncel dili al
+            const currentLang = languageRef.current || defaultLanguage;
+            showToast(t('connectedToServer', currentLang), 'success');
+
+            // Bağlandığında mevcut dili gönder
+            const storedLang = localStorage.getItem('quicktype_language') || defaultLanguage;
+            newSocket.emit('language_change', { language: storedLang });
         });
 
         newSocket.on('disconnect', (reason) => {
             setIsConnected(false);
-            // Sunucu tarafından kapatıldıysa yeniden bağlan
+            const currentLang = languageRef.current || defaultLanguage;
+
             if (reason === 'io server disconnect') {
+                setConnectionError(t('connectionLost', currentLang));
                 newSocket.connect();
+            } else if (reason === 'transport close') {
+                setConnectionError(t('errorServerUnreachable', currentLang));
             }
         });
 
@@ -86,6 +226,8 @@ function App() {
                     updated[existingIndex] = item;
                     return updated;
                 }
+                // Yeni öğe eklendi - highlight için işaretle
+                setNewItemIds(prevIds => new Set([...prevIds, item.id]));
                 return [item, ...prev];
             });
         });
@@ -104,20 +246,37 @@ function App() {
 
         newSocket.on('clipboard_copied', (data) => {
             if (data.success) {
-                showToast('PC panosuna kopyalandı!', 'success');
+                const currentLang = languageRef.current || defaultLanguage;
+                showToast(t('copiedToPCClipboard', currentLang), 'success');
             }
         });
 
         newSocket.on('clipboard_error', (data) => {
-            showToast(data.error || 'Bir hata oluştu', 'error');
+            const currentLang = languageRef.current || defaultLanguage;
+            const errorMsg = data.error || t('errorUnknown', currentLang);
+            showToast(errorMsg, 'error');
         });
 
-        newSocket.on('connect_error', () => {
-            // İlk bağlantı hatası - sessiz kal (reconnect deneyecek)
+        newSocket.on('connect_error', (error) => {
+            const currentLang = languageRef.current || defaultLanguage;
+            // Detaylı hata mesajları
+            let errorMessage = t('errorServerUnreachable', currentLang);
+            if (error.message.includes('timeout')) {
+                errorMessage = t('errorTimeout', currentLang);
+            } else if (error.message.includes('xhr') || error.message.includes('network')) {
+                errorMessage = t('errorNetworkError', currentLang);
+            }
+            setConnectionError(errorMessage);
         });
 
         newSocket.on('reconnect_failed', () => {
-            showToast('Sunucuya bağlanılamıyor!', 'error');
+            const currentLang = languageRef.current || defaultLanguage;
+            setConnectionError(t('cannotConnectToServer', currentLang));
+            showToast(t('cannotConnectToServer', currentLang), 'error');
+        });
+
+        newSocket.on('reconnecting', () => {
+            setIsRetrying(true);
         });
 
         // Pop-up event - diğer cihazlardan gelen
@@ -125,11 +284,21 @@ function App() {
             setPopupData(data);
         });
 
+        // Dil değişikliği event'i - diğer cihazlardan gelen
+        newSocket.on('language_changed', (data) => {
+            // Ref kontrolü ile gereksiz güncellemeleri önle (gerçi setState zaten kontrol eder)
+            if (data.language && data.language !== languageRef.current) {
+                setLanguage(data.language);
+                localStorage.setItem('quicktype_language', data.language);
+                showToast(t('languageChanged', data.language), 'info');
+            }
+        });
+
         socketRef.current = newSocket;
         setSocket(newSocket);
         setServerUrl(url);
         localStorage.setItem('quicktype_server_url', url);
-    }, [showToast]);
+    }, [showToast]); // language bağımlılığını kaldırdık
 
     // İlk yükleme
     useEffect(() => {
@@ -168,7 +337,7 @@ function App() {
                 content: text.trim(),
                 content_type: 'text'
             });
-            showToast('Pop-up olarak gönderildi!', 'success');
+            showToast(t('sentAsPopup', language || defaultLanguage), 'success');
         }
     };
 
@@ -182,9 +351,9 @@ function App() {
         if (!popupData) return;
         try {
             await navigator.clipboard.writeText(popupData.content || '');
-            showToast('Panoya kopyalandı!', 'success');
+            showToast(t('copiedToClipboard', language || defaultLanguage), 'success');
         } catch (err) {
-            showToast('Kopyalama başarısız!', 'error');
+            showToast(t('copyFailed', language || defaultLanguage), 'error');
         }
     };
 
@@ -240,6 +409,7 @@ function App() {
     const handleCopyToLocal = async (id) => {
         const item = clipboardItems.find(i => i.id === id);
         if (!item) return;
+        const lang = language || defaultLanguage;
 
         try {
             if (item.content_type === 'text') {
@@ -248,7 +418,7 @@ function App() {
                 const data = await response.json();
                 if (data.content) {
                     await navigator.clipboard.writeText(data.content);
-                    showToast('Panoya kopyalandı!', 'success');
+                    showToast(t('copiedToClipboard', lang), 'success');
                 }
             } else if (item.content_type === 'image') {
                 // Resim içeriği kopyala - Blob olarak
@@ -262,14 +432,14 @@ function App() {
                             [blob.type]: blob
                         })
                     ]);
-                    showToast('Resim panoya kopyalandı!', 'success');
+                    showToast(t('imageCopiedToClipboard', lang), 'success');
                 } catch (clipboardError) {
                     // Fallback: Base64 olarak text şeklinde kopyala (bazı sistemlerde)
                     console.warn('Direct image copy failed, trying fallback:', clipboardError);
                     const reader = new FileReader();
                     reader.onload = async () => {
                         await navigator.clipboard.writeText(reader.result);
-                        showToast('Resim verisi kopyalandı!', 'success');
+                        showToast(t('imageCopiedToClipboard', lang), 'success');
                     };
                     reader.readAsDataURL(blob);
                 }
@@ -277,13 +447,20 @@ function App() {
                 // Dosya - indirme linkini kopyala
                 const downloadUrl = `${serverUrl}/api/clipboard/download/${id}`;
                 await navigator.clipboard.writeText(downloadUrl);
-                showToast('İndirme linki kopyalandı!', 'success');
+                showToast(t('downloadLinkCopied', lang), 'success');
             }
         } catch (err) {
             console.error('Copy failed:', err);
-            showToast('Kopyalama başarısız!', 'error');
+            showToast(t('copyFailed', lang), 'error');
         }
     };
+
+    // Dil seçimi ekranını göster
+    if (showLanguageSetup) {
+        return <LanguageSetup onLanguageSelect={handleLanguageSetupComplete} />;
+    }
+
+    const currentLang = language || defaultLanguage;
 
     return (
         <div className="app-container">
@@ -304,6 +481,7 @@ function App() {
                     serverUrl={serverUrl}
                     isConnected={isConnected}
                     onConnect={connectToServer}
+                    language={currentLang}
                 />
 
                 {/* Header */}
@@ -316,34 +494,54 @@ function App() {
                             </svg>
                         </div>
                         <div className="header-text">
-                            <h1>Pano Yönetimi</h1>
-                            <p>İki yönlü senkronizasyon</p>
+                            <h1>{t('clipboardManagement', currentLang)}</h1>
+                            <p>{t('twoWaySync', currentLang)}</p>
                         </div>
                     </div>
-                    <StatusBadge isConnected={isConnected} />
+                    <div className="header-right">
+                        <StatusBadge isConnected={isConnected} language={currentLang} />
+                        <button
+                            className="header-settings-btn"
+                            onClick={() => setSettingsOpen(true)}
+                            title={t('settings', currentLang)}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
 
                 {/* Toggle */}
                 <ClipboardToggle
                     enabled={clipboardEnabled}
                     onToggle={handleToggle}
+                    language={currentLang}
                 />
 
                 {/* Text Input */}
-                <TextInput onSend={handleSendText} onSendPopup={handleSendPopup} />
+                <TextInput
+                    onSend={handleSendText}
+                    onSendPopup={handleSendPopup}
+                    language={currentLang}
+                />
 
                 {/* File Upload */}
-                <FileUpload onUpload={handleSendFiles} />
+                <FileUpload
+                    onUpload={handleSendFiles}
+                    language={currentLang}
+                />
 
                 {/* Legend */}
                 <div className="legend">
                     <div className="legend-item">
                         <div className="legend-dot phone"></div>
-                        <span>Telefondan</span>
+                        <span>{t('fromPhone', currentLang)}</span>
                     </div>
                     <div className="legend-item">
                         <div className="legend-dot pc"></div>
-                        <span>PC'den</span>
+                        <span>{t('fromPC', currentLang)}</span>
                     </div>
                 </div>
 
@@ -354,6 +552,8 @@ function App() {
                     onDelete={handleDeleteItem}
                     onCopyToPC={handleCopyToPC}
                     onCopyToLocal={handleCopyToLocal}
+                    language={currentLang}
+                    newItemIds={newItemIds}
                 />
 
                 {/* Clear All */}
@@ -362,20 +562,68 @@ function App() {
                         className={`clear-all-btn ${clearConfirm ? 'confirm-pending' : ''}`}
                         onClick={handleClearAll}
                     >
-                        {clearConfirm ? '⚠️ Emin misiniz? (Tıklayın)' : 'Tümünü Temizle'}
+                        {clearConfirm ? t('confirmClear', currentLang) : t('clearAll', currentLang)}
                     </button>
+                )}
+
+                {/* Connection Error Retry */}
+                {connectionError && !isConnected && (
+                    <div className="connection-error-panel glass-panel">
+                        <div className="connection-error-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </div>
+                        <div className="connection-error-text">
+                            <span className="error-title">{t('connectionLost', currentLang)}</span>
+                            <span className="error-message">{connectionError}</span>
+                        </div>
+                        <button
+                            className={`retry-btn ${isRetrying ? 'retrying' : ''}`}
+                            onClick={handleRetry}
+                            disabled={isRetrying}
+                        >
+                            {isRetrying ? (
+                                <>
+                                    <div className="retry-spinner"></div>
+                                    <span>{t('retrying', currentLang)}</span>
+                                </>
+                            ) : (
+                                <>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="23 4 23 10 17 10"></polyline>
+                                        <polyline points="1 20 1 14 7 14"></polyline>
+                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                                    </svg>
+                                    <span>{t('retry', currentLang)}</span>
+                                </>
+                            )}
+                        </button>
+                    </div>
                 )}
             </div>
 
             {/* Toast */}
             {toast && <Toast message={toast.message} type={toast.type} />}
 
+            {/* Settings Modal */}
+            <Settings
+                isOpen={settingsOpen}
+                onClose={() => setSettingsOpen(false)}
+                currentLanguage={currentLang}
+                onLanguageChange={handleLanguageChange}
+                currentTheme={theme}
+                onThemeChange={handleThemeChange}
+            />
+
             {/* Pop-up Modal */}
             {popupData && (
                 <div className="popup-modal-overlay" onClick={handleClosePopup}>
                     <div className="popup-modal glass-panel" onClick={(e) => e.stopPropagation()}>
                         <div className="popup-header">
-                            <h3>Paylaşılan İçerik</h3>
+                            <h3>{t('sharedContent', currentLang)}</h3>
                             <button className="popup-close-btn" onClick={handleClosePopup}>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -392,7 +640,7 @@ function App() {
                                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
                                 </svg>
-                                <span>Kopyala</span>
+                                <span>{t('copy', currentLang)}</span>
                             </button>
                         </div>
                     </div>

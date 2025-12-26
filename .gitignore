@@ -11,6 +11,8 @@ __pycache__/
 # Node.js / Electron
 node_modules/
 dist/
+build/
+electron-app/build/
 .npm
 *.log
 
