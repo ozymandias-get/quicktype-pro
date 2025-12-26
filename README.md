@@ -27,6 +27,31 @@
 
 ---
 
+## 📸 Ekran Görüntüleri
+
+### 🖥️ Electron Desktop Uygulaması
+
+<div align="center">
+<img src="screenshots/electron-app.png" alt="Electron Desktop App" width="350"/>
+</div>
+
+### 📱 Mobil Web Arayüzü
+
+<div align="center">
+<table>
+<tr>
+<td align="center"><img src="screenshots/mobile-keyboard.png" alt="Klavye" width="200"/><br/><b>Klavye</b></td>
+<td align="center"><img src="screenshots/mobile-touchpad.png" alt="Touchpad" width="200"/><br/><b>Touchpad</b></td>
+</tr>
+<tr>
+<td align="center"><img src="screenshots/mobile-keys.png" alt="Özel Tuşlar" width="200"/><br/><b>Özel Tuşlar</b></td>
+<td align="center"><img src="screenshots/mobile-clipboard.png" alt="Pano" width="200"/><br/><b>Pano</b></td>
+</tr>
+</table>
+</div>
+
+---
+
 ## 🔒 Güvenlik
 
 Bu uygulama yerel ağınızda çalışmak üzere tasarlanmıştır:
