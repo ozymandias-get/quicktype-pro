@@ -250,12 +250,16 @@ function createWindow() {
     const launchedHidden = process.argv.includes('--hidden');
     const shouldStartMinimized = launchedHidden || (startMinimized && isStartMinimizedEnabled());
 
+    // Menü çubuğunu kaldır
+    Menu.setApplicationMenu(null);
+
     mainWindow = new BrowserWindow({
         width: 420,
         height: 700,
         minWidth: 380,
         minHeight: 500,
         frame: true,  // Native Windows title bar kullan - yırtılmayı önler
+        autoHideMenuBar: true,  // Menü çubuğunu gizle
         backgroundColor: '#050a15',
         titleBarStyle: 'default',
         webPreferences: {
