@@ -48,7 +48,7 @@ jobs:
     - name: Install Electron dependencies
       run: |
         cd electron-app
-        npm ci
+        npm install
 
     # 7. React build
     - name: Build React app
