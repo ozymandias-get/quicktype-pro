@@ -63,7 +63,7 @@ jobs:
     - name: Build Electron App
       run: |
         cd electron-app
-        npx electron-builder --win portable --publish never
+        npx electron-builder --win nsis --publish never
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         CI: ""
@@ -74,14 +74,18 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: QuickType-Pro-Windows
-        path: electron-app/dist/*.exe
+        path: |
+          electron-app/dist/*.exe
+          electron-app/dist/*.yml
 
     # 10. Release'e yükle (tag varsa)
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
-        files: electron-app/dist/*.exe
+        files: |
+          electron-app/dist/*.exe
+          electron-app/dist/latest.yml
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

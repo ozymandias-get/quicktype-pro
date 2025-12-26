@@ -1,10 +1,15 @@
-const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain } = require('electron');
+const { app, BrowserWindow, Tray, Menu, nativeImage, shell, ipcMain, dialog } = require('electron');
+const { autoUpdater } = require('electron-updater');
 const { spawn, exec } = require('child_process');
 const path = require('path');
 const http = require('http');
 const fs = require('fs');
 
 // Hardware acceleration açık kalacak (performans için)
+
+// ==================== OTOMATİK GÜNCELLEME AYARLARI ====================
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
 
 let mainWindow;
 let tray;
@@ -464,6 +469,11 @@ if (!gotTheLock) {
         createTray();
         console.log('✅ Başlatma tamamlandı!');
 
+        // Güncelleme kontrolü (10 saniye sonra)
+        setTimeout(() => {
+            checkForUpdates();
+        }, 10000);
+
         // IPC Handlers - Pencere kontrolleri
         ipcMain.on('window-minimize', () => {
             if (mainWindow) mainWindow.minimize();
@@ -504,4 +514,98 @@ app.on('window-all-closed', () => {
 app.on('before-quit', () => {
     isQuitting = true;
     stopPythonBackend(); // Python'u kapat
+});
+
+// ==================== OTOMATİK GÜNCELLEME EVENT HANDLER'LARI ====================
+
+/**
+ * Güncelleme kontrolü başlat
+ */
+function checkForUpdates() {
+    if (app.isPackaged) {
+        console.log('🔄 Güncelleme kontrolü başlatılıyor...');
+        autoUpdater.checkForUpdatesAndNotify();
+    } else {
+        console.log('⚠️ Development modunda güncelleme kontrolü atlandı');
+    }
+}
+
+// Güncelleme bulundu
+autoUpdater.on('update-available', (info) => {
+    console.log(`✅ Yeni güncelleme bulundu: v${info.version}`);
+
+    if (mainWindow) {
+        mainWindow.webContents.send('update-available', info);
+    }
+
+    // Kullanıcıya bildir
+    dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Güncelleme Mevcut',
+        message: `QuickType Pro v${info.version} indiriliyor...`,
+        detail: 'Güncelleme arka planda indirilecek. Tamamlandığında bildirim alacaksınız.',
+        buttons: ['Tamam']
+    });
+});
+
+// Güncelleme yok
+autoUpdater.on('update-not-available', (info) => {
+    console.log('✅ Uygulama güncel:', info.version);
+});
+
+// İndirme ilerlemesi
+autoUpdater.on('download-progress', (progressObj) => {
+    const percent = Math.round(progressObj.percent);
+    console.log(`📥 İndiriliyor: ${percent}%`);
+
+    if (mainWindow) {
+        mainWindow.webContents.send('update-progress', percent);
+        mainWindow.setProgressBar(percent / 100);
+    }
+});
+
+// Güncelleme indirildi
+autoUpdater.on('update-downloaded', (info) => {
+    console.log(`✅ Güncelleme indirildi: v${info.version}`);
+
+    if (mainWindow) {
+        mainWindow.setProgressBar(-1); // Progress bar'ı kaldır
+        mainWindow.webContents.send('update-downloaded', info);
+    }
+
+    // Kullanıcıya sor
+    dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Güncelleme Hazır',
+        message: `QuickType Pro v${info.version} yüklenmeye hazır!`,
+        detail: 'Şimdi yeniden başlat tuşuna basarak güncellemeyi yükleyebilirsiniz.',
+        buttons: ['Şimdi Yeniden Başlat', 'Sonra'],
+        defaultId: 0,
+        cancelId: 1
+    }).then((result) => {
+        if (result.response === 0) {
+            isQuitting = true;
+            autoUpdater.quitAndInstall(false, true);
+        }
+    });
+});
+
+// Güncelleme hatası
+autoUpdater.on('error', (error) => {
+    console.error('❌ Güncelleme hatası:', error.message);
+
+    if (mainWindow) {
+        mainWindow.setProgressBar(-1);
+    }
+});
+
+// IPC: Manuel güncelleme kontrolü
+ipcMain.on('check-for-updates', () => {
+    checkForUpdates();
+});
+
+// IPC: Güncellemeyi yükle
+ipcMain.on('install-update', () => {
+    isQuitting = true;
+    autoUpdater.quitAndInstall(false, true);
 });
