@@ -60,9 +60,11 @@ jobs:
     - name: Build Electron App
       run: |
         cd electron-app
-        npx electron-builder --publish never
+        npx electron-builder --win portable --publish never
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CI: ""
+        ELECTRON_BUILDER_ALLOW_UNRESOLVED_DEPENDENCIES: "true"
 
     # 9. Artifact olarak yükle (debug için)
     - name: Upload Artifacts
