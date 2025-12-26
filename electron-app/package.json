@@ -27,6 +27,15 @@
         "extraMetadata": {
             "main": "main.js"
         },
+        "extraResources": [
+            {
+                "from": "backend",
+                "to": "backend",
+                "filter": [
+                    "**/*"
+                ]
+            }
+        ],
         "win": {
             "target": [
                 {

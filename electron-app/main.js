@@ -147,17 +147,35 @@ async function waitForBackend(maxAttempts = 30, interval = 500) {
  */
 function startPythonBackend() {
     return new Promise((resolve, reject) => {
-        // Proje kök dizini (electron-app'in bir üst dizini)
-        const projectRoot = path.join(__dirname, '..');
+        // Production modda gömülü EXE kullan, development modda python kullan
+        const isPackaged = app.isPackaged;
+
+        let backendPath;
+        let args = [];
+        let cwd;
+
+        if (isPackaged) {
+            // Production: Gömülü EXE
+            backendPath = path.join(process.resourcesPath, 'backend', 'quicktype-backend.exe');
+            cwd = path.dirname(backendPath);
+            console.log('📦 Production modu - Gömülü backend kullanılıyor');
+            console.log(`   EXE: ${backendPath}`);
+        } else {
+            // Development: Python script
+            backendPath = 'python';
+            args = ['main.py'];
+            cwd = path.join(__dirname, '..');
+            console.log('🔧 Development modu - Python script kullanılıyor');
+            console.log(`   Dizin: ${cwd}`);
+        }
 
         console.log('🐍 Python backend başlatılıyor...');
-        console.log(`   Dizin: ${projectRoot}`);
 
-        // spawn ile shell: true kullanarak Python'u başlat
-        pythonProcess = spawn('python', ['main.py'], {
-            cwd: projectRoot,
-            shell: true,
-            stdio: ['ignore', 'pipe', 'pipe'], // stdout ve stderr'i yakala
+        // spawn ile backend'i başlat
+        pythonProcess = spawn(backendPath, args, {
+            cwd: cwd,
+            shell: !isPackaged, // Development modda shell gerekli
+            stdio: ['ignore', 'pipe', 'pipe'],
             env: process.env,
             detached: false
         });
@@ -165,28 +183,27 @@ function startPythonBackend() {
         // Python çıktılarını logla
         if (pythonProcess.stdout) {
             pythonProcess.stdout.on('data', (data) => {
-                console.log(`[Python] ${data.toString().trim()}`);
+                console.log(`[Backend] ${data.toString().trim()}`);
             });
         }
 
         if (pythonProcess.stderr) {
             pythonProcess.stderr.on('data', (data) => {
-                console.error(`[Python ERR] ${data.toString().trim()}`);
+                console.error(`[Backend ERR] ${data.toString().trim()}`);
             });
         }
 
         pythonProcess.on('error', (error) => {
-            console.error('❌ Python başlatma hatası:', error.message);
+            console.error('❌ Backend başlatma hatası:', error.message);
             reject(error);
         });
 
         pythonProcess.on('spawn', () => {
-            console.log('🐍 Python process spawned');
-            // spawn olduğunda hemen resolve et, backend hazır kontrolü ayrıca yapılacak
+            console.log('🐍 Backend process spawned');
         });
 
         pythonProcess.on('close', (code) => {
-            console.log(`🐍 Python process kapandı (kod: ${code})`);
+            console.log(`🐍 Backend process kapandı (kod: ${code})`);
             pythonProcess = null;
         });
 

@@ -1,0 +1,82 @@
+name: Build QuickType Pro
+
+on:
+  push:
+    tags:
+      - 'v*'  # v1.0.0, v2.1.0 gibi tag'lerde çalışır
+  workflow_dispatch:  # Manuel tetikleme
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    # 1. Kodu indir
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. Python kur
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # 3. Node.js kur
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: electron-app/package-lock.json
+
+    # 4. Python bağımlılıklarını yükle
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pyinstaller
+
+    # 5. Python backend'i EXE yap
+    - name: Build Python Backend
+      run: |
+        pyinstaller --onefile --noconsole --name quicktype-backend --add-data "app;app" --add-data "static;static" main.py
+        mkdir -p electron-app/backend
+        cp dist/quicktype-backend.exe electron-app/backend/
+      shell: bash
+
+    # 6. Electron bağımlılıklarını yükle
+    - name: Install Electron dependencies
+      run: |
+        cd electron-app
+        npm ci
+
+    # 7. React build
+    - name: Build React app
+      run: |
+        cd electron-app
+        npm run react-build
+
+    # 8. Electron EXE oluştur
+    - name: Build Electron App
+      run: |
+        cd electron-app
+        npm run dist
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    # 9. Artifact olarak yükle (debug için)
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: QuickType-Pro-Windows
+        path: electron-app/dist/*.exe
+
+    # 10. Release'e yükle (tag varsa)
+    - name: Create Release
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: softprops/action-gh-release@v1
+      with:
+        files: electron-app/dist/*.exe
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
