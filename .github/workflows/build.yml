@@ -60,7 +60,7 @@ jobs:
     - name: Build Electron App
       run: |
         cd electron-app
-        npm run dist
+        npx electron-builder --publish never
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
