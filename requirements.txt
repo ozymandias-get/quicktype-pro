@@ -1,0 +1,22 @@
+# QuickType Pro - Python Bağımlılıkları
+# Versiyon pinleme ile tekrarlanabilir build'ler
+
+# Web Framework
+fastapi>=0.109.0,<0.115.0
+uvicorn[standard]>=0.27.0,<0.31.0
+
+# WebSocket
+python-socketio>=5.11.0,<6.0.0
+websockets>=12.0,<14.0
+
+# Input Kontrolü
+pynput>=1.7.6,<2.0.0
+
+# Template Engine
+jinja2>=3.1.2,<4.0.0
+
+# Windows Pano Desteği (Windows için)
+pywin32>=306; sys_platform == "win32"
+
+# Resim İşleme
+pillow>=10.2.0,<11.0.0

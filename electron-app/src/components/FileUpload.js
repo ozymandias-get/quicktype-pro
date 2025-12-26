@@ -1,0 +1,173 @@
+import React, { useState, useRef, useCallback } from 'react';
+
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_FILES_AT_ONCE = 5;
+
+function FileUpload({ onUpload, showToast }) {
+    const [isDragOver, setIsDragOver] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const fileInputRef = useRef(null);
+
+    const handleClick = () => {
+        if (!isUploading) {
+            fileInputRef.current?.click();
+        }
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        if (!isUploading) {
+            setIsDragOver(true);
+        }
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+    };
+
+    const validateAndProcessFiles = useCallback((fileList) => {
+        const files = Array.from(fileList);
+        const validFiles = [];
+
+        // Maksimum dosya sayısı kontrolü
+        if (files.length > MAX_FILES_AT_ONCE) {
+            showToast?.(`En fazla ${MAX_FILES_AT_ONCE} dosya yükleyebilirsiniz`, 'error');
+        }
+
+        files.slice(0, MAX_FILES_AT_ONCE).forEach(file => {
+            // Boyut kontrolü
+            if (file.size > MAX_FILE_SIZE) {
+                showToast?.(`${file.name} çok büyük (max 50MB)`, 'error');
+                return;
+            }
+
+            // Boş dosya kontrolü
+            if (file.size === 0) {
+                showToast?.(`${file.name} boş dosya`, 'error');
+                return;
+            }
+
+            validFiles.push(file);
+        });
+
+        return validFiles;
+    }, [showToast]);
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+
+        if (isUploading) return;
+
+        const validFiles = validateAndProcessFiles(e.dataTransfer.files);
+        if (validFiles.length > 0) {
+            processUpload(validFiles);
+        }
+    };
+
+    const handleFileChange = (e) => {
+        if (isUploading) return;
+
+        const validFiles = validateAndProcessFiles(e.target.files);
+        if (validFiles.length > 0) {
+            processUpload(validFiles);
+        }
+        e.target.value = '';
+    };
+
+    const processUpload = async (files) => {
+        setIsUploading(true);
+        setUploadProgress(0);
+
+        const totalFiles = files.length;
+        let completed = 0;
+
+        for (const file of files) {
+            try {
+                await uploadSingleFile(file);
+                completed++;
+                setUploadProgress(Math.round((completed / totalFiles) * 100));
+            } catch (error) {
+                showToast?.(`${file.name} yüklenemedi`, 'error');
+            }
+        }
+
+        setIsUploading(false);
+        setUploadProgress(0);
+    };
+
+    const uploadSingleFile = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                try {
+                    const base64 = e.target.result.split(',')[1];
+                    const contentType = file.type.startsWith('image/') ? 'image' : 'file';
+
+                    onUpload({
+                        content: base64,
+                        content_type: contentType,
+                        filename: file.name
+                    });
+
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            reader.onerror = () => reject(new Error('Dosya okunamadı'));
+            reader.readAsDataURL(file);
+        });
+    };
+
+    return (
+        <div className="glass-panel file-upload-area">
+            <div
+                className={`file-drop-zone ${isDragOver ? 'dragover' : ''} ${isUploading ? 'uploading' : ''}`}
+                onClick={handleClick}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+            >
+                {isUploading ? (
+                    <>
+                        <div className="upload-spinner"></div>
+                        <div className="file-drop-text">Yükleniyor... {uploadProgress}%</div>
+                        <div className="upload-progress-bar">
+                            <div
+                                className="upload-progress-fill"
+                                style={{ width: `${uploadProgress}%` }}
+                            ></div>
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <div className="file-drop-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                        </div>
+                        <div className="file-drop-text">Dosya yüklemek için tıkla veya sürükle</div>
+                        <div className="file-drop-hint">Resim, PDF, vb. (max 50MB)</div>
+                    </>
+                )}
+            </div>
+            <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                multiple
+                disabled={isUploading}
+                style={{ display: 'none' }}
+            />
+        </div>
+    );
+}
+
+export default FileUpload;

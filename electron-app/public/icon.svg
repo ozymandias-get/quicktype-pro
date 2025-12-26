@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="clipGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff"/>
+      <stop offset="100%" style="stop-color:#e0e7ff"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="128" height="128" rx="24" fill="url(#bgGradient)"/>
+  <g transform="translate(24, 16)">
+    <!-- Clipboard body -->
+    <rect x="10" y="12" width="60" height="80" rx="6" fill="url(#clipGradient)" opacity="0.95"/>
+    <!-- Clipboard clip -->
+    <rect x="25" y="4" width="30" height="16" rx="4" fill="url(#clipGradient)"/>
+    <rect x="32" y="8" width="16" height="8" rx="2" fill="url(#bgGradient)"/>
+    <!-- Lines -->
+    <rect x="20" y="32" width="40" height="4" rx="2" fill="#3b82f6" opacity="0.4"/>
+    <rect x="20" y="44" width="35" height="4" rx="2" fill="#3b82f6" opacity="0.4"/>
+    <rect x="20" y="56" width="40" height="4" rx="2" fill="#3b82f6" opacity="0.4"/>
+    <rect x="20" y="68" width="25" height="4" rx="2" fill="#3b82f6" opacity="0.4"/>
+    <!-- Sync arrows -->
+    <circle cx="55" cy="70" r="14" fill="#10b981"/>
+    <path d="M50 66 L55 61 L60 66 M55 61 L55 74" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M60 74 L55 79 L50 74 M55 79 L55 66" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+  </g>
+</svg>
