@@ -22,6 +22,8 @@
             "build/**/*",
             "main.js",
             "preload.js",
+            "certificateManager.js",
+            "modules/**/*",
             "public/**/*"
         ],
         "extraMetadata": {
