@@ -4,7 +4,7 @@
 
 **Telefonunuzdan bilgisayarınızı kontrol edin**
 
-![Version](https://img.shields.io/badge/version-2.1--secure-blue)
+![Version](https://img.shields.io/badge/version-3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8+-green)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-orange)
@@ -64,13 +64,47 @@
 
 Bu uygulama yerel ağınızda çalışmak üzere tasarlanmıştır:
 
+- ✅ **Sadece HTTPS** - HTTP bağlantıları devre dışı
+- ✅ **SSL/TLS** şifreleme (tüm trafik)
+- ✅ HSTS (HTTP Strict Transport Security)
+- ✅ WebAuthn/Face ID hazır altyapı
 - ✅ Rate limiting (DDoS koruması)
 - ✅ Input sanitization (Girdi doğrulama)
 - ✅ Path traversal koruması
 - ✅ Bağlantı loglama
-- ✅ Güvenlik başlıkları (CSP, XSS, vb.)
+- ✅ Güvenlik başlıkları (CSP, XSS, COOP, vb.)
+
+> 🔐 **Güvenlik Notu**: Uygulama çalışmak için HTTPS sertifikaları gerektirir. HTTP tamamen devre dışıdır.
 
 > ⚠️ **Uyarı**: Bu uygulamayı yalnızca güvendiğiniz ağlarda kullanın!
+
+### 🔐 HTTPS Kurulumu (Önerilen)
+
+Güvenli bağlantı ve Face ID desteği için HTTPS **uygulama içinden** yapılandırılır:
+
+1. QuickType Pro'yu açın
+2. **Ayarlar** (⚙️) → **HTTPS / Security** bölümüne gidin
+3. "**HTTPS Kur**" butonuna tıklayın
+4. Tamam! `https://[PC_IP]:8000` üzerinden erişin
+
+#### 📱 Telefon Sertifikası Kurulumu
+
+1. Ayarlar'da "**Telefon için Dışa Aktar**" butonuna tıklayın
+2. `QuickType-RootCA.crt` dosyasını telefonunuza gönderin
+3. Yükleyin:
+   - **iPhone**: Ayarlar → Genel → VPN ve Cihaz Yönetimi → Yükle
+   - **Android**: Dosyayı aç → CA Sertifikası olarak yükle
+
+> 💡 **Not**: Root CA'yı yalnızca bir kez yüklemeniz yeterli. Sertifikalar yenilense bile geçerli kalır.
+
+#### 🔄 IP Adresi Değişiklikleri
+
+PC'nizin IP adresi değişirse:
+- Uygulama Ayarlar'da uyarı gösterecek
+- "**Sertifikayı Yenile**" tıklayın - uygulama otomatik yeniden başlayacak
+- Telefon sertifikasını yeniden yüklemenize gerek yok!
+
+> 💡 **İpucu**: Bu sorunu kalıcı olarak önlemek için Windows Ağ Ayarlarından sabit IP belirleyin.
 
 ---
 
@@ -98,9 +132,10 @@ python main.py
 
 ### 📱 Mobil Erişim
 
-1. Backend çalışırken terminalde IP adresini görüntüleyin
-2. Telefonunuzun tarayıcısından `http://[PC_IP]:8000` adresine gidin
-3. Tüm özellikleri kullanmaya başlayın!
+1. Önce HTTPS sertifikalarını kurun (yukarıdaki Güvenlik bölümüne bakın)
+2. Uygulama başladığında gösterilen IP adresini not alın
+3. Telefonunuzun tarayıcısından `https://[PC_IP]:8000` adresine gidin
+4. Tüm özellikleri kullanmaya başlayın!
 
 ### 🖥️ Electron (PC) Kurulumu
 
@@ -146,7 +181,7 @@ npm run dist
 
 ```powershell
 # Sadece belirli IP'lerden erişime izin ver
-$env:CORS_ORIGINS="http://192.168.1.100:8000,http://192.168.1.101:8000"
+$env:CORS_ORIGINS="https://192.168.1.100:8000,https://192.168.1.101:8000"
 python main.py
 ```
 
@@ -156,19 +191,39 @@ python main.py
 
 ```
 📁 QuickType-Pro/
-├── 📄 main.py              # Python backend giriş noktası
-├── 📄 requirements.txt     # Python bağımlılıkları
-├── 📁 app/                 # Backend modülleri
-│   ├── config.py           # Yapılandırma
-│   ├── security.py         # Güvenlik fonksiyonları
-│   ├── middleware.py       # HTTP middleware
-│   ├── routes.py           # API endpoint'leri
-│   ├── controllers.py      # Klavye/Mouse kontrolü
-│   ├── socket_events.py    # WebSocket olayları
-│   └── clipboard_manager.py # Pano yönetimi
-├── 📁 static/              # Mobil web arayüzü
-├── 📁 electron-app/        # Desktop uygulaması
-└── 📁 uploads/             # Paylaşılan dosyalar
+├── 📄 main.py                  # Python backend giriş noktası
+├── 📄 requirements.txt         # Python bağımlılıkları
+├── 📁 app/                     # Backend modülleri
+│   ├── __init__.py             # Paket init
+│   ├── config.py               # Yapılandırma & sabitler
+│   ├── security.py             # Rate limiting, doğrulama
+│   ├── middleware.py           # HTTP güvenlik middleware
+│   ├── routes.py               # API endpoint'leri
+│   ├── controllers.py          # Klavye/Mouse kontrolü
+│   ├── socket_events.py        # WebSocket olayları
+│   ├── clipboard_manager.py    # Pano senkronizasyonu & dosya paylaşımı
+│   └── utils.py                # Yardımcı fonksiyonlar
+├── 📁 static/                  # Mobil web arayüzü (PWA)
+│   ├── index.html              # Mobil UI
+│   ├── manifest.json           # PWA manifest
+│   └── sw.js                   # Service worker
+├── 📁 electron-app/            # Desktop uygulaması
+│   ├── main.js                 # Electron giriş noktası
+│   ├── preload.js              # Preload script
+│   ├── certificateManager.js   # HTTPS sertifika yönetimi
+│   ├── 📁 modules/             # Modüler mimari
+│   │   ├── settings.js         # Ayarlar yönetimi
+│   │   ├── backend.js          # Python backend kontrolü
+│   │   ├── window.js           # Pencere & tray yönetimi
+│   │   ├── updater.js          # Otomatik güncelleme sistemi
+│   │   ├── ipc-handlers.js     # IPC iletişimi
+│   │   └── https-manager.js    # HTTPS IPC handler'ları
+│   ├── 📁 src/                 # React frontend
+│   └── 📁 public/              # Statik dosyalar
+├── 📁 certs/                   # SSL sertifikaları (otomatik oluşturulur)
+├── 📁 tests/                   # Birim testleri
+├── 📁 uploads/                 # Paylaşılan dosya deposu
+└── 📁 .github/workflows/       # CI/CD (GitHub Actions)
 ```
 
 ---

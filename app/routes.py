@@ -7,6 +7,12 @@ from fastapi.responses import FileResponse, JSONResponse
 
 from .config import APP_VERSION
 from .clipboard_manager import clipboard_manager
+from .utils import get_base_dir
+
+
+# Base dizin - merkezi utils'den
+BASE_DIR = get_base_dir()
+
 
 # ==================== ROUTER ====================
 router = APIRouter()
@@ -16,7 +22,7 @@ router = APIRouter()
 @router.get("/")
 async def read_index():
     """Ana sayfa"""
-    return FileResponse('static/index.html')
+    return FileResponse(BASE_DIR / 'static' / 'index.html')
 
 
 @router.get("/api/status")

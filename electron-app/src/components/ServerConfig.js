@@ -50,7 +50,7 @@ function ServerConfig({ serverUrl, isConnected, onConnect, language = 'en' }) {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="http://192.168.1.x:8000"
+                    placeholder="https://192.168.1.x:8000"
                     autoFocus
                 />
                 <button

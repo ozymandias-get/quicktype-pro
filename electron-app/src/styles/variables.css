@@ -1,0 +1,76 @@
+/* ==================== TEMA DEĞİŞKENLERİ ==================== */
+
+/* Koyu Tema (Varsayılan) */
+:root,
+[data-theme="dark"] {
+    /* Renkler - Pure Black Theme */
+    --deep-space: #000000;
+    --space-blue: #080808;
+    --glass-bg: rgba(15, 15, 15, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.06);
+    --glass-hover: rgba(255, 255, 255, 0.1);
+    --app-bg: #000000;
+    --panel-bg: rgba(18, 18, 18, 0.95);
+
+    /* Gradient Renkler */
+    --gradient-blue: linear-gradient(135deg, #3b82f6, #2563eb);
+    --gradient-purple: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    --gradient-emerald: linear-gradient(135deg, #10b981, #059669);
+    --gradient-rose: linear-gradient(135deg, #f43f5e, #e11d48);
+
+    /* Metin Renkleri */
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* Gölgeler */
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.3);
+    --shadow-glow-emerald: 0 0 20px rgba(16, 185, 129, 0.3);
+
+    /* Input ve scrollbar */
+    --input-bg: rgba(20, 20, 20, 0.9);
+    --scrollbar-track: rgba(10, 10, 10, 0.5);
+    --scrollbar-thumb: rgba(59, 130, 246, 0.3);
+
+    /* Geçişler */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Açık Tema */
+[data-theme="light"] {
+    /* Renkler - Light Theme */
+    --deep-space: #f8fafc;
+    --space-blue: #f1f5f9;
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.08);
+    --glass-hover: rgba(0, 0, 0, 0.05);
+    --app-bg: #f8fafc;
+    --panel-bg: rgba(255, 255, 255, 0.95);
+
+    /* Gradient Renkler (aynı) */
+    --gradient-blue: linear-gradient(135deg, #3b82f6, #2563eb);
+    --gradient-purple: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    --gradient-emerald: linear-gradient(135deg, #10b981, #059669);
+    --gradient-rose: linear-gradient(135deg, #f43f5e, #e11d48);
+
+    /* Metin Renkleri - Daha koyu ve okunaklı */
+    --text-primary: #111827;
+    --text-secondary: #374151;
+    --text-muted: #6b7280;
+
+    /* Gölgeler */
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.1);
+    --shadow-glow-blue: 0 0 20px rgba(59, 130, 246, 0.15);
+    --shadow-glow-emerald: 0 0 20px rgba(16, 185, 129, 0.15);
+
+    /* Input ve scrollbar */
+    --input-bg: rgba(241, 245, 249, 0.9);
+    --scrollbar-track: rgba(241, 245, 249, 0.5);
+    --scrollbar-thumb: rgba(59, 130, 246, 0.4);
+
+    /* Geçişler */
+    --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}

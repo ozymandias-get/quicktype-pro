@@ -1,0 +1,392 @@
+/* HTTPS Settings Styles */
+
+.https-settings {
+    padding: 12px 0;
+}
+
+.https-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.https-status-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.https-status-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.https-status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.https-status-badge.loading {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+}
+
+.https-status-badge.active {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.https-status-badge.inactive {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.https-status-badge.not-configured {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+}
+
+.https-ip-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.https-ip-label {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.https-ip-value {
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    color: var(--text-primary);
+}
+
+.https-url-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 8px 12px;
+    background: rgba(107, 76, 230, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(107, 76, 230, 0.2);
+}
+
+.https-url-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.https-url-value {
+    font-size: 13px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    color: var(--accent-primary);
+    word-break: break-all;
+}
+
+/* Setup Progress */
+.https-progress {
+    margin: 16px 0;
+}
+
+.https-progress-bar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.https-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.https-progress-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Setup Result */
+.https-result {
+    padding: 12px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 13px;
+}
+
+.https-result.success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+.https-result.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+/* Restart Countdown */
+.https-restart-countdown {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.https-restart-countdown p {
+    margin: 0;
+    font-size: 13px;
+}
+
+.https-restart-countdown strong {
+    font-size: 18px;
+    color: #10b981;
+}
+
+.https-restart-now-btn {
+    padding: 8px 16px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    border-radius: 6px;
+    color: #10b981;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.https-restart-now-btn:hover {
+    background: rgba(16, 185, 129, 0.3);
+}
+
+/* Action Buttons */
+.https-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+}
+
+.https-setup-btn,
+.https-export-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.https-setup-btn {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    color: white;
+}
+
+.https-setup-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(107, 76, 230, 0.3);
+}
+
+.https-setup-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.https-export-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.https-export-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Spinner */
+.https-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: https-spin 0.8s linear infinite;
+}
+
+@keyframes https-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Setup Info */
+.https-setup-info {
+    margin-top: 12px;
+    padding: 10px;
+    background: rgba(245, 158, 11, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.https-setup-info p {
+    margin: 4px 0;
+    font-size: 11px;
+    color: #f59e0b;
+}
+
+/* Phone Instructions */
+.https-phone-instructions {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.https-phone-instructions h4 {
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.https-phone-instructions ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.https-phone-instructions li {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin: 6px 0;
+    line-height: 1.4;
+}
+
+/* IP Change Warning */
+.https-ip-warning {
+    margin: 16px 0;
+    padding: 14px;
+    background: rgba(245, 158, 11, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.https-ip-warning-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.https-ip-warning-icon {
+    font-size: 18px;
+}
+
+.https-ip-warning-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #f59e0b;
+}
+
+.https-ip-warning-desc {
+    margin: 0 0 10px 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.https-ip-warning-details {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    color: #f59e0b;
+    margin-bottom: 12px;
+}
+
+.https-renew-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.https-renew-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.https-renew-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Static IP Tip */
+.https-static-ip-tip {
+    margin-top: 12px;
+    padding: 10px 12px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.https-static-ip-tip span {
+    font-size: 11px;
+    color: #3b82f6;
+    line-height: 1.4;
+}
+
+/* Light theme adjustments */
+[data-theme="light"] .https-ip-value {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .https-url-display {
+    background: rgba(107, 76, 230, 0.05);
+}
+
+[data-theme="light"] .https-export-btn {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .https-export-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .https-phone-instructions {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.05);
+}

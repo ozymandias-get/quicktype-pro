@@ -12,8 +12,7 @@ import logging
 import threading
 from datetime import datetime
 from collections import defaultdict, deque
-from typing import Union, Dict, Any
-from fastapi import Request
+from typing import Dict, Any
 
 from .config import (
     RATE_LIMIT_WINDOW,
@@ -33,10 +32,41 @@ request_counts: Dict[str, Dict[str, Any]] = defaultdict(
     lambda: {'count': 0, 'window_start': time.time()}
 )
 
+# Memory leak önleme: Maksimum takip edilecek IP sayısı
+MAX_TRACKED_IPS = 1000
+# Eski kayıtları temizleme aralığı (saniye) - 5 dakika
+CLEANUP_INTERVAL = 300
+_last_cleanup_time = time.time()
+
 # Bağlantı logları - bounded deque ile memory leak önleme
 MAX_CONNECTION_LOGS = 100
 _log_lock = threading.Lock()
 connection_logs: deque = deque(maxlen=MAX_CONNECTION_LOGS)
+
+
+def _cleanup_stale_entries(current_time: float) -> None:
+    """Eski rate limit kayıtlarını temizle (lock içinde çağrılmalı)"""
+    global _last_cleanup_time
+    
+    # Temizleme aralığı kontrolü
+    if current_time - _last_cleanup_time < CLEANUP_INTERVAL:
+        return
+    
+    _last_cleanup_time = current_time
+    
+    # 2x RATE_LIMIT_WINDOW'dan eski kayıtları bul
+    stale_threshold = current_time - (RATE_LIMIT_WINDOW * 2)
+    stale_ips = [
+        ip for ip, data in request_counts.items()
+        if data['window_start'] < stale_threshold
+    ]
+    
+    # Eski kayıtları sil
+    for ip in stale_ips:
+        del request_counts[ip]
+    
+    if stale_ips:
+        logger.debug(f"Rate limit temizliği: {len(stale_ips)} eski IP kaldırıldı")
 
 
 # ==================== IP İŞLEMLERİ ====================
@@ -56,10 +86,18 @@ def get_client_ip(request_or_environ) -> str:
 
 # ==================== RATE LIMITING ====================
 def check_rate_limit(client_ip: str) -> bool:
-    """Rate limiting kontrolü - thread-safe"""
+    """Rate limiting kontrolü - thread-safe, memory-safe"""
     current_time = time.time()
     
     with _rate_limit_lock:
+        # Periyodik temizlik
+        _cleanup_stale_entries(current_time)
+        
+        # Maksimum IP kontrolü (saldırı önleme)
+        if len(request_counts) >= MAX_TRACKED_IPS and client_ip not in request_counts:
+            logger.warning(f"Maksimum IP limiti aşıldı, yeni IP reddediliyor: {client_ip[:16]}...")
+            return False
+        
         client_data = request_counts[client_ip]
         
         if current_time - client_data['window_start'] > RATE_LIMIT_WINDOW:

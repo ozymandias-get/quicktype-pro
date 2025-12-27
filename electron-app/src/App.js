@@ -20,7 +20,7 @@ function App() {
     // Socket state
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
-    const [serverUrl, setServerUrl] = useState('http://127.0.0.1:8000');
+    const [serverUrl, setServerUrl] = useState('https://127.0.0.1:8000');
     const [connectionError, setConnectionError] = useState(null);
     const [isRetrying, setIsRetrying] = useState(false);
 
@@ -302,7 +302,7 @@ function App() {
 
     // İlk yükleme
     useEffect(() => {
-        const savedUrl = localStorage.getItem('quicktype_server_url') || 'http://127.0.0.1:8000';
+        const savedUrl = localStorage.getItem('quicktype_server_url') || 'https://127.0.0.1:8000';
         setServerUrl(savedUrl);
         connectToServer(savedUrl);
 

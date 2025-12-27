@@ -1,0 +1,371 @@
+/* ==================== AÇIK TEMA ÖZEL STİLLERİ ==================== */
+
+/* Açık tema için font smoothing ve metin kalitesi */
+[data-theme="light"] {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+/* Tüm SVG ikonları için açık temada kalite artırımı */
+[data-theme="light"] svg {
+    shape-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Settings ikonları için özel stiller */
+[data-theme="light"] .settings-menu-icon {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2));
+}
+
+[data-theme="light"] .settings-menu-icon svg {
+    stroke-width: 2;
+    stroke: currentColor;
+}
+
+[data-theme="light"] .settings-menu-icon.theme-icon {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.2), rgba(245, 158, 11, 0.2));
+    color: #d97706;
+}
+
+[data-theme="light"] .settings-menu-icon.startup-icon {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(5, 150, 105, 0.2));
+    color: #059669;
+}
+
+[data-theme="light"] .settings-menu-icon.update-icon {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(124, 58, 237, 0.2));
+    color: #7c3aed;
+}
+
+[data-theme="light"] body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-weight: 400;
+    color: #0f172a !important;
+}
+
+[data-theme="light"] .glass-panel {
+    background: var(--panel-bg);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Text Input - Açık tema için metin renkleri */
+[data-theme="light"] .text-input {
+    background: var(--input-bg);
+    color: #0f172a !important;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .text-input::placeholder {
+    color: #64748b !important;
+    font-weight: 400;
+}
+
+/* Server Input */
+[data-theme="light"] .server-input {
+    background: var(--input-bg);
+    color: #0f172a !important;
+    font-weight: 400;
+}
+
+/* Clipboard Item Content - Açık temada metin */
+[data-theme="light"] .clipboard-item-content {
+    color: #1e293b !important;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .clipboard-item-file-name {
+    color: #0f172a !important;
+    font-weight: 500;
+}
+
+[data-theme="light"] .clipboard-item-file-size {
+    color: #475569 !important;
+}
+
+/* Header metin düzeltmeleri */
+[data-theme="light"] .header-text h1 {
+    font-weight: 700;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .header-text p {
+    color: #475569 !important;
+    font-weight: 400;
+}
+
+/* Toggle Label */
+[data-theme="light"] .toggle-label-text {
+    color: #0f172a !important;
+    font-weight: 500;
+}
+
+[data-theme="light"] .toggle-label-hint {
+    color: #475569 !important;
+}
+
+/* Legend */
+[data-theme="light"] .legend-item {
+    color: #475569 !important;
+}
+
+/* File Upload */
+[data-theme="light"] .file-drop-text {
+    color: #1e293b !important;
+}
+
+[data-theme="light"] .file-drop-hint {
+    color: #64748b !important;
+}
+
+/* Clipboard Empty */
+[data-theme="light"] .clipboard-empty-text {
+    color: #475569 !important;
+}
+
+[data-theme="light"] .clipboard-empty-hint {
+    color: #64748b !important;
+}
+
+/* Clipboard Item Source */
+[data-theme="light"] .clipboard-item-source {
+    font-weight: 500 !important;
+}
+
+[data-theme="light"] .clipboard-item-time {
+    color: #64748b !important;
+}
+
+/* Clear All Button */
+[data-theme="light"] .clear-all-btn {
+    color: #dc2626 !important;
+    border-color: rgba(220, 38, 38, 0.3) !important;
+}
+
+[data-theme="light"] .toggle-switch {
+    background: rgba(203, 213, 225, 0.9);
+}
+
+[data-theme="light"] .settings-menu-item {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .settings-menu-item:hover {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .language-option {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .startup-option {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .header-settings-btn {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .header-settings-btn:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+}
+
+/* Settings Modal */
+[data-theme="light"] .settings-modal {
+    background: #ffffff;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .settings-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .settings-header h2 {
+    color: #111827;
+    font-weight: 600;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .settings-menu-label {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .settings-menu-value {
+    color: #1e293b !important;
+    font-weight: 500 !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .settings-menu-icon {
+    opacity: 1;
+    filter: none;
+    -webkit-filter: none;
+}
+
+[data-theme="light"] .settings-menu-icon svg {
+    stroke-width: 2;
+    stroke: currentColor;
+}
+
+[data-theme="light"] .settings-menu-arrow {
+    background: rgba(0, 0, 0, 0.12) !important;
+    color: #1e293b !important;
+}
+
+[data-theme="light"] .settings-menu-arrow svg {
+    stroke-width: 2.5 !important;
+    stroke: #1e293b !important;
+}
+
+[data-theme="light"] .settings-menu-arrow.rotated {
+    color: #2563eb !important;
+}
+
+[data-theme="light"] .settings-menu-item.expanded {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+[data-theme="light"] .settings-back-btn {
+    background: rgba(0, 0, 0, 0.1) !important;
+    color: #1e293b !important;
+}
+
+[data-theme="light"] .settings-back-btn svg {
+    stroke-width: 2.5;
+}
+
+[data-theme="light"] .settings-back-btn:hover {
+    background: rgba(0, 0, 0, 0.12);
+    color: #111827;
+}
+
+/* Language Options */
+[data-theme="light"] .language-option:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .language-name {
+    color: #0f172a !important;
+    font-weight: 500 !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .language-option.active {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.1));
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+/* Startup Options */
+[data-theme="light"] .startup-option:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .startup-option-label {
+    color: #0f172a !important;
+    font-weight: 500 !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .startup-option-desc {
+    color: #374151 !important;
+    font-weight: 400;
+}
+
+/* Toast Messages */
+[data-theme="light"] .toast {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Popup Modal */
+[data-theme="light"] .popup-modal-overlay {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .popup-modal {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+[data-theme="light"] .popup-text {
+    background: rgba(0, 0, 0, 0.03);
+    color: var(--text-primary);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+}
+
+[data-theme="light"] .popup-header h3 {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* Toggle Switch Light Theme */
+[data-theme="light"] .toggle-switch::after {
+    background: var(--text-muted);
+}
+
+/* Server Config */
+[data-theme="light"] .server-status-text {
+    color: var(--text-secondary);
+}
+
+/* Clipboard Item Buttons Hover */
+[data-theme="light"] .clipboard-item-btn:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+/* ==================== AÇIK TEMA - GÜNCELLEME STİLLERİ ==================== */
+
+[data-theme="light"] .update-info-row {
+    background: rgba(0, 0, 0, 0.02);
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .update-info-label {
+    color: var(--text-secondary);
+}
+
+[data-theme="light"] .update-info-value {
+    color: var(--text-primary);
+}
+
+[data-theme="light"] .update-progress {
+    background: rgba(139, 92, 246, 0.06);
+    border-color: rgba(139, 92, 246, 0.12);
+}
+
+[data-theme="light"] .update-progress-bar {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .update-error-message {
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="light"] .update-success-message {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.15);
+}
+
+[data-theme="light"] .update-btn {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(124, 58, 237, 0.1));
+    border-color: rgba(139, 92, 246, 0.2);
+}

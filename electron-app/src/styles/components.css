@@ -1,0 +1,309 @@
+/* ==================== TOGGLE SWITCH ==================== */
+
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-label-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.toggle-label-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    background: rgba(30, 30, 30, 0.9);
+    border-radius: 13px;
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    transition: var(--transition-normal);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-switch.active {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.6), rgba(5, 150, 105, 0.6));
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.toggle-switch.active::after {
+    left: 26px;
+    background: #10b981;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.6);
+}
+
+/* ==================== TEXT INPUT ==================== */
+
+.text-input-container {
+    padding: 14px 16px;
+}
+
+.text-input-wrapper {
+    position: relative;
+}
+
+.text-input {
+    width: 100%;
+    min-height: 80px;
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+    padding: 14px;
+    padding-right: 100px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--text-primary);
+    resize: none;
+    outline: none;
+    transition: var(--transition-normal);
+}
+
+.text-input::placeholder {
+    color: var(--text-muted);
+}
+
+.text-input:focus {
+    border-color: rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ==================== BUTTONS ==================== */
+
+.send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--gradient-blue);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    flex-shrink: 0;
+}
+
+.send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+}
+
+.send-btn:active {
+    transform: scale(0.95);
+}
+
+/* Send Buttons Container */
+.send-buttons {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    gap: 6px;
+}
+
+/* Pop-up Send Button */
+.popup-send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f59e0b, #ea580c);
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+    flex-shrink: 0;
+}
+
+.popup-send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.5);
+}
+
+.popup-send-btn:active {
+    transform: scale(0.95);
+}
+
+/* Clear All Button */
+.clear-all-btn {
+    width: 100%;
+    padding: 14px;
+    margin: 8px 0;
+    background: transparent;
+    border: 1px solid rgba(244, 63, 94, 0.3);
+    border-radius: 12px;
+    color: #f87171;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.clear-all-btn:hover {
+    background: rgba(244, 63, 94, 0.1);
+    border-color: rgba(244, 63, 94, 0.5);
+}
+
+.clear-all-btn.confirm-pending {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.6);
+    color: #fca5a5;
+    animation: pulse-warning 0.5s ease-in-out infinite;
+}
+
+/* ==================== FILE UPLOAD ==================== */
+
+.file-upload-area {
+    padding: 14px 16px;
+}
+
+.file-drop-zone {
+    border: 2px dashed rgba(99, 102, 241, 0.4);
+    border-radius: 14px;
+    padding: 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition-normal);
+}
+
+.file-drop-zone:hover,
+.file-drop-zone.dragover {
+    border-color: rgba(99, 102, 241, 0.8);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.file-drop-zone.uploading {
+    background: rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.4);
+    pointer-events: none;
+}
+
+.file-drop-icon {
+    color: #818cf8;
+    margin-bottom: 8px;
+}
+
+.file-drop-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.file-drop-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* ==================== SERVER CONFIG ==================== */
+
+.server-config {
+    padding: 12px 16px;
+}
+
+.server-input-group {
+    display: flex;
+    gap: 8px;
+}
+
+.server-input {
+    flex: 1;
+    height: 40px;
+    background: rgba(20, 20, 20, 0.9);
+    border: 1px solid var(--glass-border);
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--text-primary);
+    outline: none;
+    transition: var(--transition-normal);
+}
+
+.server-input:focus {
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+.server-connect-btn {
+    height: 40px;
+    padding: 0 16px;
+    background: var(--gradient-blue);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.server-connect-btn:hover {
+    opacity: 0.9;
+}
+
+.server-connect-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==================== LEGEND ==================== */
+
+.legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 8px 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+}
+
+.legend-dot.phone {
+    background: #10b981;
+}
+
+.legend-dot.pc {
+    background: #3b82f6;
+}

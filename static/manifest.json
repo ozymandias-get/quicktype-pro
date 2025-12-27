@@ -1,23 +1,32 @@
 {
     "name": "QuickType Pro",
     "short_name": "QuickType",
+    "description": "Secure cross-device clipboard management with Face ID support",
     "start_url": "/",
+    "id": "/",
+    "scope": "/",
     "display": "standalone",
     "background_color": "#050a15",
     "theme_color": "#6B4CE6",
     "orientation": "portrait",
+    "prefer_related_applications": false,
     "icons": [
         {
-            "src": "/icon-192.png",
+            "src": "/static/icon-192.png",
             "sizes": "192x192",
             "type": "image/png",
             "purpose": "any maskable"
         },
         {
-            "src": "/icon-512.png",
+            "src": "/static/icon-512.png",
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "any maskable"
         }
+    ],
+    "screenshots": [],
+    "categories": [
+        "productivity",
+        "utilities"
     ]
 }

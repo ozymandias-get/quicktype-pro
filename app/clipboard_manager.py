@@ -8,6 +8,7 @@ Değişiklikler:
 - Thread-safe yapı korundu
 """
 import os
+import sys
 import re
 import time
 import logging
@@ -98,9 +99,17 @@ class ClipboardManager:
         self._callback: Optional[Callable] = None
         
         # Dosya depolama
-        self.upload_dir = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "..", "uploads")
-        )
+        # PyInstaller EXE modunda _MEIPASS salt okunurdur, 
+        # bu yüzden uploads için executable'ın yanındaki dizini kullanmalıyız
+        if getattr(sys, 'frozen', False):
+            # EXE modunda: EXE'nin bulunduğu dizin
+            exe_dir = os.path.dirname(sys.executable)
+            self.upload_dir = os.path.abspath(os.path.join(exe_dir, "uploads"))
+        else:
+            # Normal Python modunda
+            self.upload_dir = os.path.abspath(
+                os.path.join(os.path.dirname(__file__), "..", "uploads")
+            )
         os.makedirs(self.upload_dir, exist_ok=True)
         logger.info(f"Upload dizini: {self.upload_dir}")
     
@@ -272,7 +281,13 @@ class ClipboardManager:
         """Senkron wrapper (Eski kodlar için)"""
         if content_type == "text":
             size = len(content.encode('utf-8'))
-            item = ClipboardItem(content, content_type, content, filename, "phone", size=size)
+            item = ClipboardItem(
+                content_type=content_type,
+                content=content,
+                filename=filename,
+                source="phone",
+                size=size
+            )
             if self.is_enabled:
                 self._set_pc_clipboard(content)
             self._add_item(item)

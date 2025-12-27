@@ -1,0 +1,197 @@
+/* ==================== CLIPBOARD LIST ==================== */
+
+.clipboard-list {
+    padding: 0 8px 16px;
+}
+
+.clipboard-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+
+.clipboard-empty-icon {
+    opacity: 0.5;
+    margin-bottom: 12px;
+}
+
+.clipboard-empty-text {
+    font-size: 14px;
+}
+
+.clipboard-empty-hint {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* ==================== CLIPBOARD ITEM ==================== */
+
+.clipboard-item {
+    padding: 14px;
+    margin-bottom: 10px;
+    transition: var(--transition-normal);
+    cursor: pointer;
+}
+
+.clipboard-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.clipboard-item.from-phone {
+    border-left: 3px solid #10b981;
+}
+
+.clipboard-item.from-pc {
+    border-left: 3px solid #3b82f6;
+}
+
+.clipboard-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.clipboard-item-source {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.clipboard-item-source.phone {
+    color: #34d399;
+}
+
+.clipboard-item-source.pc {
+    color: #60a5fa;
+}
+
+.clipboard-item-time {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-left: 8px;
+}
+
+.clipboard-item-actions {
+    display: flex;
+    gap: 4px;
+}
+
+.clipboard-item-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+
+.clipboard-item-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.clipboard-item-btn.copy:hover {
+    color: #60a5fa;
+    background: rgba(59, 130, 246, 0.15);
+}
+
+.clipboard-item-btn.download:hover {
+    color: #34d399;
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.clipboard-item-btn.delete:hover {
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.clipboard-item-content {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.clipboard-item-file {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.clipboard-item-file-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: rgba(139, 92, 246, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a78bfa;
+}
+
+.clipboard-item-file-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.clipboard-item-file-name {
+    font-size: 13px;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.clipboard-item-file-size {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* ==================== CLIPBOARD ITEM WRAPPER ==================== */
+
+.clipboard-item-wrapper {
+    position: relative;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.clipboard-item-wrapper.deleting {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+.clipboard-item-wrapper.new-item .clipboard-item {
+    animation: highlightPulse 2s ease-out;
+    border-color: rgba(16, 185, 129, 0.5);
+}
+
+/* Swipe Delete Background */
+.swipe-delete-bg {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 150px;
+    background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.2));
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 20px;
+    gap: 8px;
+    color: #f87171;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 0 14px 14px 0;
+    z-index: -1;
+}
+
+.swipe-delete-bg svg {
+    opacity: 0.8;
+}

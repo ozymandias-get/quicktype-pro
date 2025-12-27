@@ -1,0 +1,284 @@
+/* ==================== SETTINGS MODAL ==================== */
+
+.settings-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.settings-modal {
+    width: 100%;
+    max-width: 400px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 24px;
+    overflow: hidden;
+    animation: popupSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+    margin: 20px;
+}
+
+.settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.settings-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+
+.settings-back-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--glass-hover);
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+
+.settings-back-btn:hover {
+    background: var(--glass-border);
+    color: var(--text-primary);
+}
+
+.settings-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.settings-section {
+    margin-bottom: 24px;
+}
+
+/* Settings Menu Item - Accordion Toggle */
+.settings-menu-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.settings-menu-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.settings-menu-item.expanded {
+    background: rgba(59, 130, 246, 0.08);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.settings-menu-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(37, 99, 235, 0.15));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #60a5fa;
+    flex-shrink: 0;
+}
+
+.settings-menu-icon.theme-icon {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15));
+    color: #fbbf24;
+}
+
+.settings-menu-icon.startup-icon {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(5, 150, 105, 0.15));
+    color: #34d399;
+}
+
+.settings-menu-icon.update-icon {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(124, 58, 237, 0.15));
+    color: #a78bfa;
+}
+
+.settings-menu-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+.settings-menu-label {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+.settings-menu-value {
+    font-size: 13px;
+    color: var(--text-secondary);
+    -webkit-font-smoothing: antialiased;
+}
+
+.settings-menu-value.update-ready {
+    color: #10b981 !important;
+}
+
+.settings-menu-value.update-error-text {
+    color: #f87171 !important;
+}
+
+.settings-menu-arrow {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--glass-hover);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.settings-menu-arrow.rotated {
+    transform: rotate(180deg);
+    color: #60a5fa;
+}
+
+/* ==================== LANGUAGE DROPDOWN ==================== */
+
+.language-dropdown {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+    opacity: 0;
+    margin-top: 0;
+}
+
+.language-dropdown.open {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: 12px;
+}
+
+.language-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-left: 8px;
+}
+
+.language-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.language-option:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.language-option.active {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(5, 150, 105, 0.12));
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.language-flag {
+    font-size: 22px;
+    line-height: 1;
+}
+
+.language-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.language-option .check-icon {
+    color: #10b981;
+}
+
+/* ==================== STARTUP OPTIONS ==================== */
+
+.startup-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 8px;
+}
+
+.startup-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+}
+
+.startup-option:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.startup-option-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.startup-option-icon {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.startup-option-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.startup-option-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.startup-option-desc {
+    font-size: 11px;
+    color: var(--text-muted);
+}

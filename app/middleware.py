@@ -35,4 +35,31 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         response.headers["Content-Security-Policy"] = CSP_POLICY
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
         
+        # HTTPS Güvenlik Başlıkları (Face ID / WebAuthn hazırlığı)
+        # HSTS - HTTP Strict Transport Security
+        # max-age: 1 yıl (31536000 saniye), includeSubDomains, preload
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains; preload"
+        )
+        
+        # Permissions-Policy - Biyometrik kimlik doğrulama için gerekli izinler
+        # publickey-credentials-get: WebAuthn/PassKeys için kimlik doğrulama
+        # publickey-credentials-create: Yeni credential oluşturma izni
+        # camera: Face ID için kamera erişimi
+        response.headers["Permissions-Policy"] = (
+            "publickey-credentials-get=(self), "
+            "publickey-credentials-create=(self), "
+            "camera=(self), "
+            "geolocation=(), "
+            "microphone=()"
+        )
+        
+        # Cross-Origin politikaları (WebAuthn için önemli)
+        # COOP: same-origin-allow-popups - popup'lara izin ver (OAuth vs için)
+        # COEP: unsafe-none - harici CDN kaynakları için (Tailwind, fonts vs)
+        # Not: WebAuthn tam izolasyon gerektiriyorsa, harici kaynakları kendi sunucunuza taşıyın
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+        # COEP geçici olarak devre dışı - harici CDN'ler için
+        # response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+        
         return response

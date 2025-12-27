@@ -93,7 +93,7 @@ npm run dist
    npm start
    ```
 
-3. **Mobil arayüz için**: Telefonunuzun tarayıcısından `http://[BILGISAYAR_IP]:8000` adresine gidin
+3. **Mobil arayüz için**: Telefon sertifikasını kurduktan sonra `https://[BILGISAYAR_IP]:8000` adresine gidin
 
 ## 🏗️ Mimari
 
@@ -144,8 +144,8 @@ Ayarlar menüsüne erişmek için sağ üst köşedeki ⚙️ simgesine tıklay�
 
 ## 📝 Notlar
 - Electron uygulaması çalışması için Python backend'in çalışıyor olması gerekir
-- Backend varsayılan olarak `http://localhost:8000` adresinde çalışır
-- Farklı bir adreste çalışıyorsa, Electron uygulamasından sunucu adresini değiştirebilirsiniz
+- Backend varsayılan olarak `https://localhost:8000` adresinde çalışır (HTTPS zorunlu)
+- HTTPS sertifikası olmadan uygulama başlamaz
 - Tema ve başlangıç ayarları otomatik olarak kaydedilir
 
 ## 🔧 Teknolojiler

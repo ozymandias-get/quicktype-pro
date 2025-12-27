@@ -170,6 +170,22 @@ class TestClipboardManager:
         """Upload dizini mutlak yol"""
         from app.clipboard_manager import clipboard_manager
         assert os.path.isabs(clipboard_manager.upload_dir)
+    
+    def test_add_from_phone_text_item_fields(self):
+        """add_from_phone text item alanlarını doğru set ediyor"""
+        from app.clipboard_manager import ClipboardManager
+        manager = ClipboardManager(max_items=10)
+        # Senkron metodu test et
+        test_content = "Test metin içeriği"
+        item = manager.add_from_phone(test_content, "text")
+        
+        # ID content olmamalı (bug fix regresyon testi)
+        assert item.id != test_content
+        assert len(item.id) == 8  # UUID'in ilk 8 karakteri
+        assert item.content == test_content
+        assert item.content_type == "text"
+        assert item.source == "phone"
+        assert item.size == len(test_content.encode('utf-8'))
 
 
 class TestShortcutValidation:

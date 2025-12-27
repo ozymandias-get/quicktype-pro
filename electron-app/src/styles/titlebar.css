@@ -1,0 +1,86 @@
+/* ==================== BAŞLIK ÇUBUĞU ==================== */
+
+/* Başlık Çubuğu - Native Windows title bar kullanıldığında gizle */
+.title-bar {
+    display: none;
+}
+
+.title-bar-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.title-bar-logo {
+    width: 18px;
+    height: 18px;
+}
+
+.title-bar-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    letter-spacing: 0.3px;
+}
+
+.title-bar-buttons {
+    display: flex;
+    -webkit-app-region: no-drag;
+}
+
+.title-btn {
+    width: 46px;
+    height: 36px;
+    border-radius: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-btn::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+}
+
+.title-btn.minimize::before {
+    width: 10px;
+    height: 1px;
+    background: var(--text-secondary);
+}
+
+.title-btn.maximize::before {
+    width: 10px;
+    height: 10px;
+    border: 1px solid var(--text-secondary);
+    background: transparent;
+}
+
+.title-btn.close::before {
+    width: 12px;
+    height: 12px;
+    background: transparent;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath fill='%2394a3b8' d='M1 0L0 1l4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4-1-1-4 4z'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: none;
+}
+
+.title-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.title-btn.close:hover {
+    background: #e81123;
+}
+
+.title-btn.close:hover::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath fill='white' d='M1 0L0 1l4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4-1-1-4 4z'/%3E%3C/svg%3E");
+}

@@ -34,19 +34,22 @@ function FileUpload({ onUpload, showToast, language = 'en' }) {
 
         // Maksimum dosya sayısı kontrolü
         if (files.length > MAX_FILES_AT_ONCE) {
-            showToast?.(`Max ${MAX_FILES_AT_ONCE} files allowed`, 'error');
+            const msg = t('maxFilesAllowed', language).replace('{count}', MAX_FILES_AT_ONCE);
+            showToast?.(msg, 'error');
         }
 
         files.slice(0, MAX_FILES_AT_ONCE).forEach(file => {
             // Boyut kontrolü
             if (file.size > MAX_FILE_SIZE) {
-                showToast?.(`${file.name} is too large (max 50MB)`, 'error');
+                const msg = t('fileTooLarge', language).replace('{filename}', file.name);
+                showToast?.(msg, 'error');
                 return;
             }
 
             // Boş dosya kontrolü
             if (file.size === 0) {
-                showToast?.(`${file.name} is empty`, 'error');
+                const msg = t('fileIsEmpty', language).replace('{filename}', file.name);
+                showToast?.(msg, 'error');
                 return;
             }
 
@@ -54,7 +57,7 @@ function FileUpload({ onUpload, showToast, language = 'en' }) {
         });
 
         return validFiles;
-    }, [showToast]);
+    }, [showToast, language]);
 
     const handleDrop = (e) => {
         e.preventDefault();
@@ -103,7 +106,7 @@ function FileUpload({ onUpload, showToast, language = 'en' }) {
                 {isUploading ? (
                     <>
                         <div className="upload-spinner"></div>
-                        <div className="file-drop-text">Uploading... {uploadProgress}%</div>
+                        <div className="file-drop-text">{t('uploadingProgress', language).replace('{progress}', uploadProgress)}</div>
                         <div className="upload-progress-bar">
                             <div
                                 className="upload-progress-fill"

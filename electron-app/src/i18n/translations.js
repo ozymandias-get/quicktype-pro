@@ -120,6 +120,10 @@ const translations = {
             uploadingFile: 'Uploading file...',
             uploadComplete: 'Upload complete!',
             uploadFailed: 'Upload failed',
+            maxFilesAllowed: 'Maximum {count} files allowed',
+            fileTooLarge: '{filename} is too large (max 50MB)',
+            fileIsEmpty: '{filename} is empty',
+            uploadingProgress: 'Uploading... {progress}%',
 
             // Updates
             updates: 'Updates',
@@ -255,6 +259,10 @@ const translations = {
             uploadingFile: 'Dosya yükleniyor...',
             uploadComplete: 'Yükleme tamamlandı!',
             uploadFailed: 'Yükleme başarısız',
+            maxFilesAllowed: 'En fazla {count} dosya yükleyebilirsiniz',
+            fileTooLarge: '{filename} çok büyük (maksimum 50MB)',
+            fileIsEmpty: '{filename} boş',
+            uploadingProgress: 'Yükleniyor... %{progress}',
 
             // Updates
             updates: 'Güncellemeler',
@@ -374,7 +382,7 @@ const translations = {
 
             // Errors
             errorServerUnreachable: 'Server nicht erreichbar. Prüfen Sie, ob der Server läuft.',
-            errorTimeout: 'Verbindung zeitüberschreitung. Bitte erneut versuchen.',
+            errorTimeout: 'Verbindungszeitüberschreitung. Bitte erneut versuchen.',
             errorNetworkError: 'Netzwerkfehler. Prüfen Sie Ihre Verbindung.',
             errorUnknown: 'Ein unbekannter Fehler ist aufgetreten.',
 
@@ -390,6 +398,10 @@ const translations = {
             uploadingFile: 'Datei wird hochgeladen...',
             uploadComplete: 'Upload abgeschlossen!',
             uploadFailed: 'Upload fehlgeschlagen',
+            maxFilesAllowed: 'Maximal {count} Dateien erlaubt',
+            fileTooLarge: '{filename} ist zu groß (max. 50MB)',
+            fileIsEmpty: '{filename} ist leer',
+            uploadingProgress: 'Hochladen... {progress}%',
 
             // Updates
             updates: 'Updates',
@@ -525,6 +537,10 @@ const translations = {
             uploadingFile: 'Téléchargement du fichier...',
             uploadComplete: 'Téléchargement terminé!',
             uploadFailed: 'Échec du téléchargement',
+            maxFilesAllowed: 'Maximum {count} fichiers autorisés',
+            fileTooLarge: '{filename} est trop volumineux (max 50Mo)',
+            fileIsEmpty: '{filename} est vide',
+            uploadingProgress: 'Téléchargement... {progress}%',
 
             // Updates
             updates: 'Mises à jour',
@@ -660,6 +676,10 @@ const translations = {
             uploadingFile: 'Subiendo archivo...',
             uploadComplete: '¡Subida completada!',
             uploadFailed: 'Error al subir',
+            maxFilesAllowed: 'Máximo {count} archivos permitidos',
+            fileTooLarge: '{filename} es demasiado grande (máx. 50MB)',
+            fileIsEmpty: '{filename} está vacío',
+            uploadingProgress: 'Subiendo... {progress}%',
 
             // Updates
             updates: 'Actualizaciones',
@@ -795,6 +815,10 @@ const translations = {
             uploadingFile: '正在上传文件...',
             uploadComplete: '上传完成！',
             uploadFailed: '上传失败',
+            maxFilesAllowed: '最多允许 {count} 个文件',
+            fileTooLarge: '{filename} 太大（最大 50MB）',
+            fileIsEmpty: '{filename} 是空的',
+            uploadingProgress: '上传中... {progress}%',
 
             // Updates
             updates: '更新',

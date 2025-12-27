@@ -66,6 +66,34 @@ contextBridge.exposeInMainWorld('electronAPI', {
         return () => ipcRenderer.removeListener('update-error', callback);
     },
 
+    // ==================== HTTPS SERTİFİKA API'LERİ ====================
+    // HTTPS durumunu kontrol et
+    checkHttpsStatus: () => ipcRenderer.invoke('check-https-status'),
+
+    // HTTPS kurulumunu başlat
+    setupHttps: () => ipcRenderer.invoke('setup-https'),
+
+    // Root CA'yı dışa export (telefon için)
+    exportRootCA: () => ipcRenderer.invoke('export-root-ca'),
+
+    // Yerel IP'yi al
+    getLocalIP: () => ipcRenderer.invoke('get-local-ip'),
+
+    // IP değişikliği kontrolü
+    checkIPChange: () => ipcRenderer.invoke('check-ip-change'),
+
+    // Sertifikayı yenile
+    renewCertificate: () => ipcRenderer.invoke('renew-certificate'),
+
+    // HTTPS kurulum progress listener
+    onHttpsSetupProgress: (callback) => {
+        ipcRenderer.on('https-setup-progress', callback);
+        return () => ipcRenderer.removeListener('https-setup-progress', callback);
+    },
+
+    // Uygulamayı yeniden başlat
+    restartApp: () => ipcRenderer.invoke('restart-app'),
+
     // Electron olduğunu bildir
     isElectron: true
 });

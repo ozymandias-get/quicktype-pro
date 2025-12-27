@@ -4,7 +4,7 @@
 
 **Contrôlez votre ordinateur depuis votre téléphone**
 
-![Version](https://img.shields.io/badge/version-2.1--secure-blue)
+![Version](https://img.shields.io/badge/version-3.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8+-green)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-orange)
@@ -64,13 +64,47 @@
 
 Cette application est conçue pour fonctionner sur votre réseau local :
 
+- ✅ **HTTPS uniquement** - Connexions HTTP désactivées
+- ✅ **SSL/TLS** chiffrement pour tout le trafic
+- ✅ HSTS (HTTP Strict Transport Security)
+- ✅ Infrastructure prête pour WebAuthn/Face ID
 - ✅ Limitation de débit (protection DDoS)
 - ✅ Validation des entrées
 - ✅ Protection contre le path traversal
 - ✅ Journalisation des connexions
-- ✅ En-têtes de sécurité (CSP, XSS, etc.)
+- ✅ En-têtes de sécurité (CSP, XSS, COOP, etc.)
+
+> 🔐 **Note de sécurité** : L'application nécessite des certificats HTTPS pour fonctionner. HTTP est complètement désactivé.
 
 > ⚠️ **Avertissement** : N'utilisez cette application que sur des réseaux de confiance !
+
+### 🔐 Configuration HTTPS (Recommandé)
+
+Pour des connexions sécurisées et le support Face ID, HTTPS est configuré **depuis l'application** :
+
+1. Ouvrez QuickType Pro
+2. Allez dans **Paramètres** (⚙️) → **HTTPS / Security**
+3. Cliquez sur "**Configurer HTTPS**"
+4. Terminé ! Accédez via `https://[PC_IP]:8000`
+
+#### 📱 Installation du Certificat sur Téléphone
+
+1. Dans les Paramètres, cliquez sur "**Exporter pour Téléphone**"
+2. Envoyez le fichier `QuickType-RootCA.crt` à votre téléphone
+3. Installez :
+   - **iPhone** : Réglages → Général → VPN et gestion des appareils → Installer
+   - **Android** : Ouvrir le fichier → Installer comme certificat CA
+
+> 💡 **Note** : Le Root CA ne doit être installé qu'une seule fois. Il reste valide même lors du renouvellement des certificats.
+
+#### 🔄 Changements d'Adresse IP
+
+Si l'adresse IP de votre PC change :
+- L'application affiche un avertissement dans les Paramètres
+- Cliquez sur "**Renouveler le Certificat**" - l'application redémarre automatiquement
+- Pas besoin de réinstaller le certificat du téléphone !
+
+> 💡 **Conseil** : Définissez une IP statique dans les Paramètres Réseau Windows pour éviter définitivement ce problème.
 
 ---
 
@@ -98,9 +132,10 @@ python main.py
 
 ### 📱 Accès Mobile
 
-1. Notez l'adresse IP affichée dans le terminal
-2. Accédez à `http://[PC_IP]:8000` depuis le navigateur de votre téléphone
-3. Commencez à utiliser toutes les fonctionnalités !
+1. Configurez d'abord les certificats HTTPS (voir section Sécurité ci-dessus)
+2. Notez l'adresse IP affichée au démarrage de l'app
+3. Accédez à `https://[PC_IP]:8000` depuis le navigateur de votre téléphone
+4. Commencez à utiliser toutes les fonctionnalités !
 
 ### 🖥️ Configuration Electron (PC)
 
@@ -146,7 +181,7 @@ npm run dist
 
 ```powershell
 # Autoriser l'accès uniquement depuis des IPs spécifiques
-$env:CORS_ORIGINS="http://192.168.1.100:8000,http://192.168.1.101:8000"
+$env:CORS_ORIGINS="https://192.168.1.100:8000,https://192.168.1.101:8000"
 python main.py
 ```
 
@@ -156,19 +191,39 @@ python main.py
 
 ```
 📁 QuickType-Pro/
-├── 📄 main.py              # Point d'entrée du backend Python
-├── 📄 requirements.txt     # Dépendances Python
-├── 📁 app/                 # Modules backend
-│   ├── config.py           # Configuration
-│   ├── security.py         # Fonctions de sécurité
-│   ├── middleware.py       # Middleware HTTP
-│   ├── routes.py           # Points d'API
-│   ├── controllers.py      # Contrôle clavier/souris
-│   ├── socket_events.py    # Événements WebSocket
-│   └── clipboard_manager.py # Gestion presse-papiers
-├── 📁 static/              # Interface web mobile
-├── 📁 electron-app/        # Application de bureau
-└── 📁 uploads/             # Fichiers partagés
+├── 📄 main.py                  # Point d'entrée du backend Python
+├── 📄 requirements.txt         # Dépendances Python
+├── 📁 app/                     # Modules backend
+│   ├── __init__.py             # Init du paquet
+│   ├── config.py               # Configuration & constantes
+│   ├── security.py             # Rate limiting, validation
+│   ├── middleware.py           # Middleware de sécurité HTTP
+│   ├── routes.py               # Points d'API
+│   ├── controllers.py          # Contrôle clavier/souris
+│   ├── socket_events.py        # Événements WebSocket
+│   ├── clipboard_manager.py    # Sync presse-papiers & partage fichiers
+│   └── utils.py                # Fonctions utilitaires
+├── 📁 static/                  # Interface web mobile (PWA)
+│   ├── index.html              # UI Mobile
+│   ├── manifest.json           # Manifeste PWA
+│   └── sw.js                   # Service Worker
+├── 📁 electron-app/            # Application de bureau
+│   ├── main.js                 # Point d'entrée Electron
+│   ├── preload.js              # Script de préchargement
+│   ├── certificateManager.js   # Gestion certificats HTTPS
+│   ├── 📁 modules/             # Architecture modulaire
+│   │   ├── settings.js         # Gestion des paramètres
+│   │   ├── backend.js          # Contrôle backend Python
+│   │   ├── window.js           # Gestion fenêtre & barre système
+│   │   ├── updater.js          # Système de mise à jour auto
+│   │   ├── ipc-handlers.js     # Communication IPC
+│   │   └── https-manager.js    # Handlers IPC HTTPS
+│   ├── 📁 src/                 # Frontend React
+│   └── 📁 public/              # Assets statiques
+├── 📁 certs/                   # Certificats SSL (générés auto)
+├── 📁 tests/                   # Tests unitaires
+├── 📁 uploads/                 # Stockage fichiers partagés
+└── 📁 .github/workflows/       # CI/CD (GitHub Actions)
 ```
 
 ---

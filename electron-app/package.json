@@ -1,6 +1,6 @@
 {
     "name": "quicktype-pro-desktop",
-    "version": "2.1.0",
+    "version": "3.0.0",
     "description": "QuickType Pro - Pano Yönetim Merkezi (Desktop)",
     "main": "main.js",
     "scripts": {
