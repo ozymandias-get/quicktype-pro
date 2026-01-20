@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { t } from '../i18n/translations';
+import { APP_CONSTANTS } from '../constants';
 
-function TextInput({ onSend, onSendPopup, language = 'en' }) {
+function TextInput({ onSend, onSendPopup, language = APP_CONSTANTS.DEFAULT_LANGUAGE }) {
     const [text, setText] = useState('');
 
     const handleSubmit = () => {

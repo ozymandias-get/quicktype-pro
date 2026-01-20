@@ -1,13 +1,22 @@
 import React, { useState, useRef } from 'react';
 import ClipboardItem from './ClipboardItem';
 import { t } from '../i18n/translations';
+import { APP_CONSTANTS } from '../constants';
 
-function ClipboardList({ items, serverUrl, onDelete, onCopyToPC, onCopyToLocal, language = 'en', newItemIds = new Set() }) {
+// Basic prop validation via default props
+function ClipboardList({
+    items = [],
+    serverUrl = '',
+    onDelete = () => { },
+    onCopyToPC = () => { },
+    onCopyToLocal = () => { },
+    language = APP_CONSTANTS.DEFAULT_LANGUAGE,
+    newItemIds = new Set()
+}) {
     const [deletingIds, setDeletingIds] = useState(new Set());
     const [swipingId, setSwipingId] = useState(null);
     const [swipeOffset, setSwipeOffset] = useState(0);
     const touchStartRef = useRef({ x: 0, y: 0 });
-    const swipeThreshold = 100; // Silme için minimum swipe mesafesi
 
     // Swipe başlangıç
     const handleTouchStart = (e, itemId) => {
@@ -36,13 +45,13 @@ function ClipboardList({ items, serverUrl, onDelete, onCopyToPC, onCopyToLocal, 
 
         // Sadece sola swipe
         if (diffX > 0) {
-            setSwipeOffset(Math.min(diffX, 150));
+            setSwipeOffset(Math.min(diffX, APP_CONSTANTS.SWIPE.MAX_OFFSET));
         }
     };
 
     // Swipe bitiş
     const handleTouchEnd = (itemId) => {
-        if (swipeOffset > swipeThreshold) {
+        if (swipeOffset > APP_CONSTANTS.SWIPE.THRESHOLD) {
             handleDeleteWithAnimation(itemId);
         }
         setSwipingId(null);
@@ -61,7 +70,7 @@ function ClipboardList({ items, serverUrl, onDelete, onCopyToPC, onCopyToLocal, 
                 newSet.delete(id);
                 return newSet;
             });
-        }, 300);
+        }, APP_CONSTANTS.SWIPE.ANIMATION_DELAY);
     };
 
     if (!items || items.length === 0) {

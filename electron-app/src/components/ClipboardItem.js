@@ -1,14 +1,15 @@
 import React from 'react';
 import { t } from '../i18n/translations';
+import { APP_CONSTANTS } from '../constants';
 
-function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal, language = 'en', isNew = false }) {
-    const isFromPhone = item.source === 'phone';
+function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal, language = APP_CONSTANTS.DEFAULT_LANGUAGE, isNew = false }) {
+    const isFromPhone = item.source === APP_CONSTANTS.ITEM_SOURCES.PHONE;
     const isText = item.content_type === 'text';
     const isImage = item.content_type === 'image';
 
     const formatFileSize = (bytes) => {
         if (!bytes || bytes === 0) return '0 B';
-        const k = 1024;
+        const k = APP_CONSTANTS.CLIPBOARD_ITEM.KILOBYTE;
         const sizes = ['B', 'KB', 'MB', 'GB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
@@ -37,10 +38,7 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal, l
     // Source label based on language
     const getSourceLabel = () => {
         if (isFromPhone) {
-            return language === 'tr' ? 'Telefon' :
-                language === 'de' ? 'Telefon' :
-                    language === 'fr' ? 'Téléphone' :
-                        language === 'es' ? 'Teléfono' : 'Phone';
+            return t('fromPhone', language);
         }
         return 'PC';
     };
@@ -49,7 +47,6 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal, l
         <div
             className={`glass-panel clipboard-item ${isFromPhone ? 'from-phone' : 'from-pc'}`}
             onClick={handleItemClick}
-            style={{ cursor: 'pointer' }}
         >
             {/* Header */}
             <div className="clipboard-item-header">
@@ -115,7 +112,7 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal, l
                     <button
                         className="clipboard-item-btn delete"
                         onClick={handleDeleteClick}
-                        title={language === 'tr' ? 'Sil' : language === 'de' ? 'Löschen' : language === 'fr' ? 'Supprimer' : language === 'es' ? 'Eliminar' : 'Delete'}
+                        title={t('delete', language)}
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <polyline points="3 6 5 6 21 6"></polyline>
@@ -128,8 +125,8 @@ function ClipboardItem({ item, serverUrl, onDelete, onCopyToPC, onCopyToLocal, l
             {/* Content */}
             {isText ? (
                 <div className="clipboard-item-content">
-                    {item.preview || item.content?.substring(0, 100) || ''}
-                    {(item.preview?.length >= 100 || (item.content?.length || 0) > 100) && '...'}
+                    {item.preview || item.content?.substring(0, APP_CONSTANTS.CLIPBOARD_ITEM.PREVIEW_LENGTH) || ''}
+                    {(item.preview?.length >= APP_CONSTANTS.CLIPBOARD_ITEM.PREVIEW_LENGTH || (item.content?.length || 0) > APP_CONSTANTS.CLIPBOARD_ITEM.PREVIEW_LENGTH) && '...'}
                 </div>
             ) : (
                 <div className="clipboard-item-file">

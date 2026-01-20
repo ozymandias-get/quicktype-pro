@@ -31,12 +31,15 @@ class CertificateManager {
      * Sertifika dizinini belirle
      */
     getCertsDir() {
-        // Production: resourcesPath içinde
-        // Development: proje kök dizininde
-        if (process.resourcesPath && fs.existsSync(path.join(process.resourcesPath, 'backend'))) {
-            return path.join(process.resourcesPath, 'certs');
+        // Always use userData for writable persistent storage
+        try {
+            // Import app dynamically if not available (it's available in main process)
+            const { app } = require('electron');
+            return path.join(app.getPath('userData'), 'certs');
+        } catch (e) {
+            // Fallback for dev/testing
+            return path.join(__dirname, '..', 'certs');
         }
-        return path.join(__dirname, '..', 'certs');
     }
 
     /**

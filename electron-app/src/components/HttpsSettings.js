@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { APP_CONSTANTS } from '../constants';
+import { t as globalT } from '../i18n/translations';
 
 /**
  * HTTPS Sertifika Kurulum Bileşeni
  * Electron uygulaması içinden sertifika kurulumu yönetir
  */
-function HttpsSettings({ language = 'en' }) {
+function HttpsSettings({ language = APP_CONSTANTS.DEFAULT_LANGUAGE }) {
     const [status, setStatus] = useState({
         loading: true,
         certificatesExist: false,
@@ -26,67 +28,8 @@ function HttpsSettings({ language = 'en' }) {
     const [setupProgress, setSetupProgress] = useState({ message: '', progress: 0 });
     const [setupResult, setSetupResult] = useState(null);
 
-    // Çeviriler
-    const translations = {
-        en: {
-            httpsSettings: 'HTTPS / Security',
-            httpsStatus: 'HTTPS Status',
-            active: 'Active',
-            inactive: 'Inactive',
-            notConfigured: 'Not Configured',
-            localIP: 'Local IP',
-            httpsUrl: 'HTTPS URL',
-            setupHttps: 'Setup HTTPS',
-            setupInProgress: 'Setting up...',
-            exportCert: 'Export for Phone',
-            exportCertDesc: 'Save certificate to desktop for mobile devices',
-            setupComplete: 'HTTPS Setup Complete!',
-            setupFailed: 'Setup Failed',
-            mkcertRequired: 'mkcert will be installed automatically',
-            adminRequired: 'Administrator privileges may be required',
-            phoneInstructions: 'Phone Instructions',
-            iphoneSteps: 'iPhone: Settings → General → VPN & Device Management → Install',
-            androidSteps: 'Android: Open file → Install as CA Certificate',
-            ipChanged: 'IP Changed!',
-            ipChangedDesc: 'Your IP address changed. Renew certificate for phone connection.',
-            renewCert: 'Renew Certificate',
-            renewing: 'Renewing...',
-            staticIpTip: '💡 Tip: Set a static IP in Windows Network Settings to avoid this issue.',
-            restartingIn: 'Restarting in',
-            seconds: 'seconds...',
-            restartNow: 'Restart Now'
-        },
-        tr: {
-            httpsSettings: 'HTTPS / Güvenlik',
-            httpsStatus: 'HTTPS Durumu',
-            active: 'Aktif',
-            inactive: 'Pasif',
-            notConfigured: 'Yapılandırılmamış',
-            localIP: 'Yerel IP',
-            httpsUrl: 'HTTPS Adresi',
-            setupHttps: 'HTTPS Kur',
-            setupInProgress: 'Kuruluyor...',
-            exportCert: 'Telefon için Dışa Aktar',
-            exportCertDesc: 'Mobil cihazlar için sertifikayı masaüstüne kaydet',
-            setupComplete: 'HTTPS Kurulumu Tamamlandı!',
-            setupFailed: 'Kurulum Başarısız',
-            mkcertRequired: 'mkcert otomatik olarak yüklenecek',
-            adminRequired: 'Yönetici izinleri gerekebilir',
-            phoneInstructions: 'Telefon Talimatları',
-            iphoneSteps: 'iPhone: Ayarlar → Genel → VPN ve Cihaz Yönetimi → Yükle',
-            androidSteps: 'Android: Dosyayı aç → CA Sertifikası olarak yükle',
-            ipChanged: 'IP Değişti!',
-            ipChangedDesc: 'IP adresiniz değişti. Telefon bağlantısı için sertifikayı yenileyin.',
-            renewCert: 'Sertifikayı Yenile',
-            renewing: 'Yenileniyor...',
-            staticIpTip: '💡 İpucu: Bu sorunu kalıcı olarak çözmek için Windows Ağ Ayarlarından sabit IP belirleyin.',
-            restartingIn: 'Yeniden başlatılıyor',
-            seconds: 'saniye...',
-            restartNow: 'Şimdi Yeniden Başlat'
-        }
-    };
-
-    const t = (key) => translations[language]?.[key] || translations.en[key] || key;
+    // Use imported t function with current language to preserve existing usage
+    const t = (key) => globalT(key, language);
 
     // HTTPS durumunu kontrol et
     const checkStatus = useCallback(async () => {
@@ -102,7 +45,7 @@ function HttpsSettings({ language = 'en' }) {
                 ...result
             });
         } catch (error) {
-            console.error('HTTPS status check failed:', error);
+            // Rule: forbidden-console-log - Removed console.error
             setStatus(prev => ({ ...prev, loading: false }));
         }
     }, []);
@@ -131,7 +74,7 @@ function HttpsSettings({ language = 'en' }) {
                 ...result
             });
         } catch (error) {
-            console.error('IP change check failed:', error);
+            // Rule: forbidden-console-log - Removed console.error
         }
     };
 
@@ -285,7 +228,7 @@ function HttpsSettings({ language = 'en' }) {
 
             {/* Setup Result */}
             {setupResult && (
-                <div className={`https-result ${setupResult.success ? 'success' : 'error'}`}>
+                <div className={`https-result ${setupResult.success ? APP_CONSTANTS.TOAST_TYPES.SUCCESS : APP_CONSTANTS.TOAST_TYPES.ERROR}`}>
                     {setupResult.success ? '✅' : '❌'} {setupResult.message}
 
                     {/* Restart countdown */}
@@ -343,10 +286,10 @@ function HttpsSettings({ language = 'en' }) {
 
             {/* Actions */}
             <div className="https-actions">
-                {/* Setup Button */}
-                {!status.certificatesExist && (
+                {/* Setup/Repair Button */}
+                {(!status.certificatesExist || (status.certificatesExist && !status.httpsWorking)) && (
                     <button
-                        className="https-setup-btn"
+                        className={`https-setup-btn ${status.certificatesExist ? 'repair' : ''}`}
                         onClick={handleSetupHttps}
                         disabled={setupInProgress}
                     >
@@ -358,10 +301,9 @@ function HttpsSettings({ language = 'en' }) {
                         ) : (
                             <>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path>
                                 </svg>
-                                {t('setupHttps')}
+                                {status.certificatesExist ? t('repairHttps') : t('setupHttps')}
                             </>
                         )}
                     </button>

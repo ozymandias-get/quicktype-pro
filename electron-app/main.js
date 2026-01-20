@@ -33,6 +33,25 @@ const quittingRef = {
     set value(v) { windowManager.setQuitting(v); }
 };
 
+// ==================== LOGGING ====================
+const fs = require('fs');
+const path = require('path');
+const logFile = path.join(app.getPath('userData'), 'startup.log');
+
+function logToFile(msg) {
+    try {
+        const timestamp = new Date().toISOString();
+        fs.appendFileSync(logFile, `[${timestamp}] ${msg}\n`);
+    } catch (e) {
+        // ignore
+    }
+}
+
+// Log initial startup
+logToFile('App starting...');
+logToFile(`Args: ${process.argv.join(' ')}`);
+logToFile(`Resource Path: ${process.resourcesPath}`);
+
 // ==================== TEK INSTANCE KONTROLÜ ====================
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -78,12 +97,14 @@ if (!gotTheLock) {
 
                 if (!backendReady) {
                     console.error('❌ Backend başlatılamadı!');
+                    logToFile('❌ Backend started but check failed (timeout)');
                     app.quit();
                     return;
                 }
             }
         } catch (error) {
             console.error('❌ Backend hatası:', error.message);
+            logToFile(`❌ Backend Error: ${error.message}\n${error.stack}`);
             app.quit();
             return;
         }

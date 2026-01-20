@@ -24,7 +24,7 @@ const DEFAULT_SETTINGS = {
 };
 
 // Desteklenen değerler
-const SUPPORTED_LANGUAGES = ['en', 'tr', 'de', 'fr', 'es', 'zh'];
+const SUPPORTED_LANGUAGES = ['en', 'tr'];
 const SUPPORTED_THEMES = ['dark', 'light', 'system'];
 
 /**

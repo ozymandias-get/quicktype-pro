@@ -278,7 +278,6 @@
     color: var(--text-primary);
 }
 
-.startup-option-desc {
-    font-size: 11px;
-    color: var(--text-muted);
+.settings-spacer {
+    width: 32px;
 }

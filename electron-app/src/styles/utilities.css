@@ -214,6 +214,8 @@
     transform: rotate(180deg);
 }
 
-.pull-to-refresh-indicator.refreshing .pull-indicator-icon {
-    animation: spin 1s linear infinite;
+
+/* ==================== UTILITY ==================== */
+.hidden {
+    display: none;
 }

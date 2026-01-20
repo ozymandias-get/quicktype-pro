@@ -1,7 +1,8 @@
 import React from 'react';
 import { t } from '../i18n/translations';
+import { APP_CONSTANTS } from '../constants';
 
-function ClipboardToggle({ enabled, onToggle, language = 'en' }) {
+function ClipboardToggle({ enabled, onToggle, language = APP_CONSTANTS.DEFAULT_LANGUAGE }) {
     return (
         <div className="toggle-container glass-panel">
             <div className="toggle-label">

@@ -17,7 +17,9 @@ function LanguageSetup({ onLanguageSelect }) {
                         <button
                             key={lang.code}
                             className="setup-language-btn"
-                            onClick={() => onLanguageSelect(lang.code)}
+                            onClick={() => {
+                                onLanguageSelect(lang.code);
+                            }}
                             style={{ animationDelay: `${index * 0.06}s` }}
                         >
                             <span className="lang-flag">{lang.flag}</span>

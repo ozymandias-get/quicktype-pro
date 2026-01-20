@@ -1,10 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { t } from '../i18n/translations';
+import { APP_CONSTANTS } from '../constants';
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-const MAX_FILES_AT_ONCE = 5;
-
-function FileUpload({ onUpload, showToast, language = 'en' }) {
+function FileUpload({ onUpload, showToast, language = APP_CONSTANTS.DEFAULT_LANGUAGE }) {
     const [isDragOver, setIsDragOver] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -33,23 +31,23 @@ function FileUpload({ onUpload, showToast, language = 'en' }) {
         const validFiles = [];
 
         // Maksimum dosya sayısı kontrolü
-        if (files.length > MAX_FILES_AT_ONCE) {
-            const msg = t('maxFilesAllowed', language).replace('{count}', MAX_FILES_AT_ONCE);
-            showToast?.(msg, 'error');
+        if (files.length > APP_CONSTANTS.FILE_UPLOAD.MAX_FILES) {
+            const msg = t('maxFilesAllowed', language).replace('{count}', APP_CONSTANTS.FILE_UPLOAD.MAX_FILES);
+            showToast?.(msg, APP_CONSTANTS.TOAST_TYPES.ERROR);
         }
 
-        files.slice(0, MAX_FILES_AT_ONCE).forEach(file => {
+        files.slice(0, APP_CONSTANTS.FILE_UPLOAD.MAX_FILES).forEach(file => {
             // Boyut kontrolü
-            if (file.size > MAX_FILE_SIZE) {
+            if (file.size > APP_CONSTANTS.FILE_UPLOAD.MAX_SIZE) {
                 const msg = t('fileTooLarge', language).replace('{filename}', file.name);
-                showToast?.(msg, 'error');
+                showToast?.(msg, APP_CONSTANTS.TOAST_TYPES.ERROR);
                 return;
             }
 
             // Boş dosya kontrolü
             if (file.size === 0) {
                 const msg = t('fileIsEmpty', language).replace('{filename}', file.name);
-                showToast?.(msg, 'error');
+                showToast?.(msg, APP_CONSTANTS.TOAST_TYPES.ERROR);
                 return;
             }
 
@@ -134,7 +132,7 @@ function FileUpload({ onUpload, showToast, language = 'en' }) {
                 onChange={handleFileChange}
                 multiple
                 disabled={isUploading}
-                style={{ display: 'none' }}
+                className="hidden"
             />
         </div>
     );

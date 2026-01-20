@@ -7,8 +7,8 @@ const { spawn, exec } = require('child_process');
 const https = require('https');
 const path = require('path');
 
-// Backend URL - SADECE HTTPS
-const BACKEND_URL = 'https://127.0.0.1:8000';
+// Backend URL - Başlangıçta varsayılan, ama dinamik değişebilir
+let currentBackendUrl = 'https://127.0.0.1:8000';
 
 // Python process referansı
 let pythonProcess = null;
@@ -18,7 +18,7 @@ let pythonProcess = null;
  * @returns {string}
  */
 function getBackendUrl() {
-    return BACKEND_URL;
+    return currentBackendUrl;
 }
 
 /**
@@ -26,21 +26,41 @@ function getBackendUrl() {
  * @returns {Promise<boolean>}
  */
 function checkBackendReady() {
+    return new Promise(async (resolve) => {
+        // Önce HTTPS dene
+        const tryHttps = await checkUrl('https://127.0.0.1:8000/api/status');
+        if (tryHttps) {
+            currentBackendUrl = 'https://127.0.0.1:8000';
+            resolve(true);
+            return;
+        }
+
+        // Olmazsa HTTP dene (Setup Mode)
+        const tryHttp = await checkUrl('http://127.0.0.1:8000/api/status');
+        if (tryHttp) {
+            currentBackendUrl = 'http://127.0.0.1:8000';
+            console.log('⚠️ Backend HTTP modunda çalışıyor (Setup Mode)');
+            resolve(true);
+            return;
+        }
+
+        resolve(false);
+    });
+}
+
+/**
+ * URL kontrolü yapan yardımcı fonksiyon
+ */
+function checkUrl(url) {
     return new Promise((resolve) => {
-        const req = https.get(`${BACKEND_URL}/api/status`, (res) => {
-            let data = '';
-            res.on('data', chunk => data += chunk);
-            res.on('end', () => {
-                try {
-                    const json = JSON.parse(data);
-                    resolve(json.status === 'online');
-                } catch (e) {
-                    resolve(res.statusCode === 200);
-                }
-            });
+        const client = url.startsWith('https') ? https : require('http');
+        const req = client.get(url, { rejectUnauthorized: false }, (res) => {
+            // Veriyi tüket ki socket asılı kalmasın
+            res.resume();
+            resolve(res.statusCode === 200);
         });
         req.on('error', () => resolve(false));
-        req.setTimeout(2000, () => {
+        req.setTimeout(1000, () => {
             req.destroy();
             resolve(false);
         });
@@ -53,7 +73,7 @@ function checkBackendReady() {
  * @param {number} interval - Deneme aralığı (ms)
  * @returns {Promise<boolean>}
  */
-async function waitForBackend(maxAttempts = 30, interval = 500) {
+async function waitForBackend(maxAttempts = 30, interval = 1000) {
     for (let i = 0; i < maxAttempts; i++) {
         const ready = await checkBackendReady();
         if (ready) return true;
@@ -77,9 +97,14 @@ function startPythonBackend() {
         if (isPackaged) {
             backendPath = path.join(process.resourcesPath, 'backend', 'quicktype-backend.exe');
             cwd = path.dirname(backendPath);
+            // Pass certs dir in userData
+            const certsDir = path.join(app.getPath('userData'), 'certs');
+            args = ['--certs-dir', certsDir];
         } else {
             backendPath = 'python';
-            args = ['main.py'];
+            // Also pass certs dir in dev mode standardizing on userData
+            const certsDir = path.join(app.getPath('userData'), 'certs');
+            args = ['main.py', '--certs-dir', certsDir];
             cwd = path.join(__dirname, '..', '..');
         }
 
@@ -90,6 +115,15 @@ function startPythonBackend() {
             env: process.env,
             detached: false
         });
+
+        // Pipe stdout/stderr to log file in production
+        if (isPackaged && pythonProcess.stdout) {
+            const fs = require('fs');
+            const logPath = path.join(app.getPath('userData'), 'backend.log');
+            const stream = fs.createWriteStream(logPath, { flags: 'a' });
+            pythonProcess.stdout.pipe(stream);
+            pythonProcess.stderr.pipe(stream);
+        }
 
         pythonProcess.on('error', (error) => reject(error));
         pythonProcess.on('close', () => { pythonProcess = null; });
@@ -145,7 +179,6 @@ function killPythonProcess() {
 }
 
 module.exports = {
-    BACKEND_URL,
     getBackendUrl,
     checkBackendReady,
     waitForBackend,

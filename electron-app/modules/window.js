@@ -62,10 +62,23 @@ function createWindow(startMinimized = false) {
     });
 
     // Development veya production moduna göre URL
-    const startUrl = process.env.ELECTRON_START_URL ||
+    let startUrl = process.env.ELECTRON_START_URL ||
         `file://${path.join(__dirname, '..', 'build', 'index.html')}`;
 
+    // Dev modunda HTTP protokolünü zorla ve sadece yükle
+    if (startUrl.includes('localhost:3000') || startUrl.includes('127.0.0.1:3000')) {
+        startUrl = startUrl.replace('https://', 'http://');
+    }
+
+    console.log('� Yüklenen URL:', startUrl);
     mainWindow.loadURL(startUrl);
+
+    // HTTPS hatalarını sadece logla (yeniden deneme yapma - sonsuz döngü önlenir)
+    mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
+        if (errorCode === -501 || errorDescription.includes('SSL')) {
+            console.log('⚠️ SSL hatası (yoksayılıyor):', validatedURL);
+        }
+    });
 
     // Hazır olunca göster
     mainWindow.once('ready-to-show', () => {

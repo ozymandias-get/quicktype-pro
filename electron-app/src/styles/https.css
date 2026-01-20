@@ -204,6 +204,10 @@
     color: white;
 }
 
+.https-setup-btn.repair {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
 .https-setup-btn:hover:not(:disabled) {
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(107, 76, 230, 0.3);

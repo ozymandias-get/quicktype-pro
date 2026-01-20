@@ -52,10 +52,6 @@ Mouse ve klavye kontrolü bu sürümde yoktur - bu özellikler sadece mobil tara
 ### 🌍 Çoklu Dil Desteği
 - 🇬🇧 English
 - 🇹🇷 Türkçe
-- 🇩🇪 Deutsch
-- 🇫🇷 Français
-- 🇪🇸 Español
-- 🇨🇳 中文
 
 ## 📥 Kurulum
 
@@ -110,16 +106,38 @@ quicktype-pro/
 │   └── app.js
 └── electron-app/           # Electron desktop (sadece pano)
     ├── main.js             # Electron ana işlem
+    ├── modules/            # Electron modülleri (yeni)
+    │   ├── backend.js
+    │   ├── https-manager.js
+    │   ├── ipc-handlers.js
+    │   ├── settings.js
+    │   ├── updater.js
+    │   └── window.js
     ├── preload.js          # IPC köprüsü
     ├── src/
     │   ├── App.js          # Ana React bileşeni
+    │   ├── constants.js    # Sabitler
     │   ├── components/     # UI bileşenleri
     │   │   ├── Settings.js       # Ayarlar paneli
     │   │   ├── ClipboardList.js  # Pano listesi
     │   │   ├── ClipboardItem.js  # Pano öğesi
-    │   │   └── ...
+    │   │   ├── FileUpload.js     # Dosya yükleme
+    │   │   ├── StatusBadge.js    # Durum göstergesi
+    │   │   ├── TextInput.js      # Metin girişi
+    │   │   ├── settings/         # Ayar alt bileşenleri
+    │   │   │   ├── ThemeSettings.js
+    │   │   │   ├── StartupSettings.js
+    │   │   │   └── ...
+    │   │   └── layout/           # Layout bileşenleri
+    │   │       ├── HeaderSection.js
+    │   │       └── ...
     │   ├── styles/
-    │   │   └── index.css   # Tema ve stiller
+    │   │   ├── main.css      # Ana stiller
+    │   │   ├── components.css
+    │   │   ├── clipboard.css
+    │   │   ├── settings.css
+    │   │   ├── utilities.css
+    │   │   └── https.css
     │   └── i18n/
     │       └── translations.js  # Çoklu dil desteği
     └── public/

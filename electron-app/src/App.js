@@ -3,7 +3,6 @@ import io from 'socket.io-client';
 
 // Components
 import TitleBar from './components/TitleBar';
-import StatusBadge from './components/StatusBadge';
 import ClipboardToggle from './components/ClipboardToggle';
 import TextInput from './components/TextInput';
 import FileUpload from './components/FileUpload';
@@ -13,14 +12,21 @@ import Toast from './components/Toast';
 import Settings from './components/Settings';
 import LanguageSetup from './components/LanguageSetup';
 
+// Extracted Components
+import AppBackground from './components/layout/AppBackground';
+import HeaderSection from './components/layout/HeaderSection';
+import ConnectionErrorPanel from './components/layout/ConnectionErrorPanel';
+import SharedContentPopup from './components/popups/SharedContentPopup';
+
 // i18n
 import { t, defaultLanguage } from './i18n/translations';
+import { APP_CONSTANTS } from './constants';
 
 function App() {
     // Socket state
     const [socket, setSocket] = useState(null);
     const [isConnected, setIsConnected] = useState(false);
-    const [serverUrl, setServerUrl] = useState('https://127.0.0.1:8000');
+    const [serverUrl, setServerUrl] = useState(APP_CONSTANTS.DEFAULT_SERVER_URL);
     const [connectionError, setConnectionError] = useState(null);
     const [isRetrying, setIsRetrying] = useState(false);
 
@@ -44,12 +50,12 @@ function App() {
 
     // Theme state
     const [theme, setTheme] = useState(() => {
-        return localStorage.getItem('quicktype_theme') || 'dark';
+        return localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.THEME) || APP_CONSTANTS.THEMES.DARK;
     });
 
     // Language state
     const [language, setLanguage] = useState(() => {
-        return localStorage.getItem('quicktype_language') || null;
+        return localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.LANGUAGE) || null;
     });
     const [showLanguageSetup, setShowLanguageSetup] = useState(false);
 
@@ -71,16 +77,16 @@ function App() {
     // Tema uygula
     const applyTheme = useCallback((themeName) => {
         document.documentElement.setAttribute('data-theme', themeName);
-        if (themeName === 'system') {
+        if (themeName === APP_CONSTANTS.THEMES.SYSTEM) {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', prefersDark ? APP_CONSTANTS.THEMES.DARK : APP_CONSTANTS.THEMES.LIGHT);
         }
     }, []);
 
     // İlk yüklemede dil ve tema kontrolü
     useEffect(() => {
         const initApp = async () => {
-            let savedLang = localStorage.getItem('quicktype_language');
+            let savedLang = localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.LANGUAGE);
 
             // LocalStorage'da yoksa Electron'dan (diskten) okumayı dene
             if (!savedLang && window.electronAPI?.getLanguage) {
@@ -88,11 +94,11 @@ function App() {
                     const electronLang = await window.electronAPI.getLanguage();
                     if (electronLang) {
                         savedLang = electronLang;
-                        localStorage.setItem('quicktype_language', savedLang);
-                        console.log('Language synced from Electron:', savedLang);
+                        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.LANGUAGE, savedLang);
+                        // console.log removed (Rule: forbidden-console-log)
                     }
                 } catch (e) {
-                    console.error('Failed to sync language from Electron:', e);
+                    // console.error removed, strictly suppressed in production or use internal logger if needed
                 }
             }
 
@@ -106,7 +112,7 @@ function App() {
         initApp();
 
         // Tema yükle
-        const savedTheme = localStorage.getItem('quicktype_theme') || 'dark';
+        const savedTheme = localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.THEME) || APP_CONSTANTS.THEMES.DARK;
         setTheme(savedTheme);
         applyTheme(savedTheme);
     }, [applyTheme]);
@@ -114,28 +120,33 @@ function App() {
     // Tema değişikliği
     const handleThemeChange = useCallback((newTheme) => {
         setTheme(newTheme);
-        localStorage.setItem('quicktype_theme', newTheme);
+        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.THEME, newTheme);
         applyTheme(newTheme);
         window.electronAPI?.setTheme?.(newTheme);
     }, [applyTheme]);
 
     // Toast göster
-    const showToast = useCallback((message, type = 'info') => {
+    const showToast = useCallback((message, type = APP_CONSTANTS.TOAST_TYPES.INFO) => {
         setToast({ message, type });
-        setTimeout(() => setToast(null), 2500);
+        setTimeout(() => setToast(null), APP_CONSTANTS.TIMEOUTS.TOAST);
     }, []);
 
     // Dil değişikliği
-    const handleLanguageChange = useCallback((langCode) => {
+    const handleLanguageChange = useCallback((langCode, isFromSocket = false) => {
         setLanguage(langCode);
-        localStorage.setItem('quicktype_language', langCode);
+        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.LANGUAGE, langCode);
 
-        // Socket üzerinden dil değişikliğini yayınla
-        if (socketRef.current && socketRef.current.connected) {
-            socketRef.current.emit('language_change', { language: langCode });
+        // Electron ayarlarına da kaydet (Böylece yeniden başlatınca hatırlanır)
+        window.electronAPI?.setLanguage?.(langCode);
+
+        // Socket üzerinden dil değişikliğini yayınla (sadece biz değiştirdiysek)
+        if (!isFromSocket && socketRef.current && socketRef.current.connected) {
+            socketRef.current.emit(APP_CONSTANTS.SOCKET_EVENTS.LANGUAGE_CHANGE, { language: langCode });
         }
 
-        showToast(t('languageChanged', langCode), 'success');
+        if (!isFromSocket) {
+            showToast(t('languageChanged', langCode), APP_CONSTANTS.TOAST_TYPES.SUCCESS);
+        }
     }, [showToast]);
 
     // Language setup tamamlandığında
@@ -154,7 +165,7 @@ function App() {
             socketRef.current.connect();
         }
 
-        setTimeout(() => setIsRetrying(false), 3000);
+        setTimeout(() => setIsRetrying(false), APP_CONSTANTS.TIMEOUTS.RETRY_DELAY);
     }, []);
 
     // Yeni eklenen öğeler için highlight temizle
@@ -162,7 +173,7 @@ function App() {
         if (newItemIds.size > 0) {
             const timer = setTimeout(() => {
                 setNewItemIds(new Set());
-            }, 2000);
+            }, APP_CONSTANTS.TIMEOUTS.HIGHLIGHT_DURATION);
             return () => clearTimeout(timer);
         }
     }, [newItemIds]);
@@ -174,33 +185,33 @@ function App() {
         }
 
         // localhost'u 127.0.0.1'e çevir (IPv6 sorununu önlemek için)
-        const fixedUrl = url.replace('localhost', '127.0.0.1');
+        const fixedUrl = url.replace('localhost', APP_CONSTANTS.LOCALHOST_IPV4);
 
         const newSocket = io(fixedUrl, {
             transports: ['websocket', 'polling'], // WebSocket öncelikli (daha hızlı)
             reconnection: true,
-            reconnectionDelay: 1000,              // 1 saniye
-            reconnectionDelayMax: 5000,           // Maksimum 5 saniye
+            reconnectionDelay: APP_CONSTANTS.TIMEOUTS.SOCKET_RECONNECTION_DELAY,
+            reconnectionDelayMax: APP_CONSTANTS.TIMEOUTS.SOCKET_RECONNECTION_DELAY_MAX,
             reconnectionAttempts: Infinity,       // Sonsuz deneme
             randomizationFactor: 0.5,             // Thundering herd önleme
-            timeout: 15000
+            timeout: APP_CONSTANTS.TIMEOUTS.SOCKET_TIMEOUT
         });
 
-        newSocket.on('connect', () => {
+        newSocket.on(APP_CONSTANTS.SOCKET_EVENTS.CONNECT, () => {
             setIsConnected(true);
             setConnectionError(null);
             setIsRetrying(false);
 
             // Ref kullanarak güncel dili al
             const currentLang = languageRef.current || defaultLanguage;
-            showToast(t('connectedToServer', currentLang), 'success');
+            showToast(t('connectedToServer', currentLang), APP_CONSTANTS.TOAST_TYPES.SUCCESS);
 
             // Bağlandığında mevcut dili gönder
-            const storedLang = localStorage.getItem('quicktype_language') || defaultLanguage;
-            newSocket.emit('language_change', { language: storedLang });
+            const storedLang = localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.LANGUAGE) || defaultLanguage;
+            newSocket.emit(APP_CONSTANTS.SOCKET_EVENTS.LANGUAGE_CHANGE, { language: storedLang });
         });
 
-        newSocket.on('disconnect', (reason) => {
+        newSocket.on(APP_CONSTANTS.SOCKET_EVENTS.DISCONNECT, (reason) => {
             setIsConnected(false);
             const currentLang = languageRef.current || defaultLanguage;
 
@@ -213,12 +224,12 @@ function App() {
         });
 
         // Clipboard events
-        newSocket.on('clipboard_init', (data) => {
+        newSocket.on(APP_CONSTANTS.SOCKET_EVENTS.CLIPBOARD_INIT, (data) => {
             setClipboardItems(data.items || []);
             setClipboardEnabled(data.enabled);
         });
 
-        newSocket.on('clipboard_update', (item) => {
+        newSocket.on(APP_CONSTANTS.SOCKET_EVENTS.CLIPBOARD_UPDATE, (item) => {
             setClipboardItems(prev => {
                 const existingIndex = prev.findIndex(i => i.id === item.id);
                 if (existingIndex >= 0) {
@@ -232,29 +243,29 @@ function App() {
             });
         });
 
-        newSocket.on('clipboard_state', (data) => {
+        newSocket.on(APP_CONSTANTS.SOCKET_EVENTS.CLIPBOARD_STATE, (data) => {
             setClipboardEnabled(data.enabled);
         });
 
-        newSocket.on('clipboard_deleted', (data) => {
+        newSocket.on(APP_CONSTANTS.SOCKET_EVENTS.CLIPBOARD_DELETED, (data) => {
             setClipboardItems(prev => prev.filter(item => item.id !== data.id));
         });
 
-        newSocket.on('clipboard_cleared', () => {
+        newSocket.on(APP_CONSTANTS.SOCKET_EVENTS.CLIPBOARD_CLEARED, () => {
             setClipboardItems([]);
         });
 
-        newSocket.on('clipboard_copied', (data) => {
+        newSocket.on(APP_CONSTANTS.SOCKET_EVENTS.CLIPBOARD_COPIED, (data) => {
             if (data.success) {
                 const currentLang = languageRef.current || defaultLanguage;
-                showToast(t('copiedToPCClipboard', currentLang), 'success');
+                showToast(t('copiedToPCClipboard', currentLang), APP_CONSTANTS.TOAST_TYPES.SUCCESS);
             }
         });
 
-        newSocket.on('clipboard_error', (data) => {
+        newSocket.on(APP_CONSTANTS.SOCKET_EVENTS.CLIPBOARD_ERROR, (data) => {
             const currentLang = languageRef.current || defaultLanguage;
             const errorMsg = data.error || t('errorUnknown', currentLang);
-            showToast(errorMsg, 'error');
+            showToast(errorMsg, APP_CONSTANTS.TOAST_TYPES.ERROR);
         });
 
         newSocket.on('connect_error', (error) => {
@@ -272,7 +283,7 @@ function App() {
         newSocket.on('reconnect_failed', () => {
             const currentLang = languageRef.current || defaultLanguage;
             setConnectionError(t('cannotConnectToServer', currentLang));
-            showToast(t('cannotConnectToServer', currentLang), 'error');
+            showToast(t('cannotConnectToServer', currentLang), APP_CONSTANTS.TOAST_TYPES.ERROR);
         });
 
         newSocket.on('reconnecting', () => {
@@ -286,23 +297,25 @@ function App() {
 
         // Dil değişikliği event'i - diğer cihazlardan gelen
         newSocket.on('language_changed', (data) => {
-            // Ref kontrolü ile gereksiz güncellemeleri önle (gerçi setState zaten kontrol eder)
+            // Ref kontrolü ile gereksiz güncellemeleri önle
             if (data.language && data.language !== languageRef.current) {
-                setLanguage(data.language);
-                localStorage.setItem('quicktype_language', data.language);
-                showToast(t('languageChanged', data.language), 'info');
+                // isFromSocket = true olarak çağır
+                handleLanguageChange(data.language, true);
+
+                // Toast göster (bilgi amaçlı)
+                showToast(t('languageChanged', data.language), APP_CONSTANTS.TOAST_TYPES.INFO);
             }
         });
 
         socketRef.current = newSocket;
         setSocket(newSocket);
         setServerUrl(url);
-        localStorage.setItem('quicktype_server_url', url);
+        localStorage.setItem(APP_CONSTANTS.STORAGE_KEYS.SERVER_URL, url);
     }, [showToast]); // language bağımlılığını kaldırdık
 
     // İlk yükleme
     useEffect(() => {
-        const savedUrl = localStorage.getItem('quicktype_server_url') || 'https://127.0.0.1:8000';
+        const savedUrl = localStorage.getItem(APP_CONSTANTS.STORAGE_KEYS.SERVER_URL) || APP_CONSTANTS.DEFAULT_SERVER_URL;
         setServerUrl(savedUrl);
         connectToServer(savedUrl);
 
@@ -337,7 +350,7 @@ function App() {
                 content: text.trim(),
                 content_type: 'text'
             });
-            showToast(t('sentAsPopup', language || defaultLanguage), 'success');
+            showToast(t('sentAsPopup', language || defaultLanguage), APP_CONSTANTS.TOAST_TYPES.SUCCESS);
         }
     };
 
@@ -351,9 +364,9 @@ function App() {
         if (!popupData) return;
         try {
             await navigator.clipboard.writeText(popupData.content || '');
-            showToast(t('copiedToClipboard', language || defaultLanguage), 'success');
+            showToast(t('copiedToClipboard', language || defaultLanguage), APP_CONSTANTS.TOAST_TYPES.SUCCESS);
         } catch (err) {
-            showToast(t('copyFailed', language || defaultLanguage), 'error');
+            showToast(t('copyFailed', language || defaultLanguage), APP_CONSTANTS.TOAST_TYPES.ERROR);
         }
     };
 
@@ -389,7 +402,7 @@ function App() {
             setClearConfirm(true);
             clearTimeoutRef.current = setTimeout(() => {
                 setClearConfirm(false);
-            }, 3000);
+            }, APP_CONSTANTS.TIMEOUTS.RETRY_DELAY);
         } else {
             // İkinci tıklama - sil
             if (clearTimeoutRef.current) {
@@ -418,7 +431,7 @@ function App() {
                 const data = await response.json();
                 if (data.content) {
                     await navigator.clipboard.writeText(data.content);
-                    showToast(t('copiedToClipboard', lang), 'success');
+                    showToast(t('copiedToClipboard', lang), APP_CONSTANTS.TOAST_TYPES.SUCCESS);
                 }
             } else if (item.content_type === 'image') {
                 // Resim içeriği kopyala - Blob olarak
@@ -432,14 +445,15 @@ function App() {
                             [blob.type]: blob
                         })
                     ]);
-                    showToast(t('imageCopiedToClipboard', lang), 'success');
+                    showToast(t('imageCopiedToClipboard', lang), APP_CONSTANTS.TOAST_TYPES.SUCCESS);
                 } catch (clipboardError) {
                     // Fallback: Base64 olarak text şeklinde kopyala (bazı sistemlerde)
-                    console.warn('Direct image copy failed, trying fallback:', clipboardError);
+                    // console.warn removed or replaced with conditional logs if necessary, 
+                    // keeping silent fallbacks for cleaner console
                     const reader = new FileReader();
                     reader.onload = async () => {
                         await navigator.clipboard.writeText(reader.result);
-                        showToast(t('imageCopiedToClipboard', lang), 'success');
+                        showToast(t('imageCopiedToClipboard', lang), APP_CONSTANTS.TOAST_TYPES.SUCCESS);
                     };
                     reader.readAsDataURL(blob);
                 }
@@ -447,11 +461,11 @@ function App() {
                 // Dosya - indirme linkini kopyala
                 const downloadUrl = `${serverUrl}/api/clipboard/download/${id}`;
                 await navigator.clipboard.writeText(downloadUrl);
-                showToast(t('downloadLinkCopied', lang), 'success');
+                showToast(t('downloadLinkCopied', lang), APP_CONSTANTS.TOAST_TYPES.SUCCESS);
             }
         } catch (err) {
-            console.error('Copy failed:', err);
-            showToast(t('copyFailed', lang), 'error');
+            // console.error removed
+            showToast(t('copyFailed', lang), APP_CONSTANTS.TOAST_TYPES.ERROR);
         }
     };
 
@@ -464,12 +478,8 @@ function App() {
 
     return (
         <div className="app-container">
-            {/* Background Orbs */}
-            <div className="bg-orbs">
-                <div className="orb orb-1"></div>
-                <div className="orb orb-2"></div>
-                <div className="orb orb-3"></div>
-            </div>
+            {/* Background */}
+            <AppBackground />
 
             {/* Title Bar */}
             <TitleBar />
@@ -485,33 +495,11 @@ function App() {
                 />
 
                 {/* Header */}
-                <div className="glass-panel header-section">
-                    <div className="header-content">
-                        <div className="header-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="9" y="2" width="6" height="4" rx="1" ry="1"></rect>
-                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                            </svg>
-                        </div>
-                        <div className="header-text">
-                            <h1>{t('clipboardManagement', currentLang)}</h1>
-                            <p>{t('twoWaySync', currentLang)}</p>
-                        </div>
-                    </div>
-                    <div className="header-right">
-                        <StatusBadge isConnected={isConnected} language={currentLang} />
-                        <button
-                            className="header-settings-btn"
-                            onClick={() => setSettingsOpen(true)}
-                            title={t('settings', currentLang)}
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="3"></circle>
-                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
+                <HeaderSection
+                    language={currentLang}
+                    isConnected={isConnected}
+                    onOpenSettings={() => setSettingsOpen(true)}
+                />
 
                 {/* Toggle */}
                 <ClipboardToggle
@@ -567,42 +555,13 @@ function App() {
                 )}
 
                 {/* Connection Error Retry */}
-                {connectionError && !isConnected && (
-                    <div className="connection-error-panel glass-panel">
-                        <div className="connection-error-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="8" x2="12" y2="12"></line>
-                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                            </svg>
-                        </div>
-                        <div className="connection-error-text">
-                            <span className="error-title">{t('connectionLost', currentLang)}</span>
-                            <span className="error-message">{connectionError}</span>
-                        </div>
-                        <button
-                            className={`retry-btn ${isRetrying ? 'retrying' : ''}`}
-                            onClick={handleRetry}
-                            disabled={isRetrying}
-                        >
-                            {isRetrying ? (
-                                <>
-                                    <div className="retry-spinner"></div>
-                                    <span>{t('retrying', currentLang)}</span>
-                                </>
-                            ) : (
-                                <>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="23 4 23 10 17 10"></polyline>
-                                        <polyline points="1 20 1 14 7 14"></polyline>
-                                        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-                                    </svg>
-                                    <span>{t('retry', currentLang)}</span>
-                                </>
-                            )}
-                        </button>
-                    </div>
-                )}
+                <ConnectionErrorPanel
+                    isConnected={isConnected}
+                    connectionError={connectionError}
+                    isRetrying={isRetrying}
+                    onRetry={handleRetry}
+                    language={currentLang}
+                />
             </div>
 
             {/* Toast */}
@@ -619,33 +578,12 @@ function App() {
             />
 
             {/* Pop-up Modal */}
-            {popupData && (
-                <div className="popup-modal-overlay" onClick={handleClosePopup}>
-                    <div className="popup-modal glass-panel" onClick={(e) => e.stopPropagation()}>
-                        <div className="popup-header">
-                            <h3>{t('sharedContent', currentLang)}</h3>
-                            <button className="popup-close-btn" onClick={handleClosePopup}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="popup-body">
-                            <pre className="popup-text">{popupData.content}</pre>
-                        </div>
-                        <div className="popup-actions">
-                            <button className="popup-copy-btn" onClick={handleCopyPopup}>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                </svg>
-                                <span>{t('copy', currentLang)}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <SharedContentPopup
+                popupData={popupData}
+                onClose={handleClosePopup}
+                onCopy={handleCopyPopup}
+                language={currentLang}
+            />
         </div>
     );
 }
