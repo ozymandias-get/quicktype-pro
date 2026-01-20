@@ -96,10 +96,20 @@ function initApp() {
 }
 
 // DOM hazır olduğunda uygulamayı başlat
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-} else {
+// DOM hazır olduğunda uygulamayı başlat
+let appInitialized = false;
+
+function bootstrap() {
+    if (appInitialized) return;
+    appInitialized = true;
     initApp();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootstrap);
+} else {
+    // Zaten yüklüyse hemen başlat
+    setTimeout(bootstrap, 0);
 }
 
 // Export for debugging

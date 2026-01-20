@@ -89,50 +89,72 @@ def get_ssl_config():
 
 # ==================== ANA BAŞLATMA ====================
 if __name__ == "__main__":
+    import argparse
+    import sys
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--certs-dir", help="Directory for SSL certificates")
+    args, unknown = parser.parse_known_args()
+    
     local_ip = get_local_ip()
     print_startup_banner(local_ip, SERVER_PORT)
     
     # SSL yapılandırmasını al
-    ssl_certfile, ssl_keyfile = get_ssl_config()
+    ssl_certfile = None
+    ssl_keyfile = None
     
-    # ==================== HTTPS ZORUNLU ====================
-    # Sertifika yoksa uygulama başlamaz
+    # 1. Komut satırından gelen dizine bak
+    if args.certs_dir:
+        from pathlib import Path
+        custom_cert_dir = Path(args.certs_dir)
+        print(f"📂 Sertifika dizini (CLI): {custom_cert_dir}")
+        
+        cert_names = [
+            ("localhost+2.pem", "localhost+2-key.pem"),
+            ("cert.pem", "key.pem"),
+            ("server.crt", "server.key"),
+        ]
+        
+        for cert_file, key_file in cert_names:
+            c_path = custom_cert_dir / cert_file
+            k_path = custom_cert_dir / key_file
+            if c_path.exists() and k_path.exists():
+                ssl_certfile = str(c_path)
+                ssl_keyfile = str(k_path)
+                print(f"🔐 Sertifika bulundu: {cert_file}")
+                break
+    
+    # 2. Bulunamadıysa varsayılan get_ssl_config'i dene
+    if not ssl_certfile:
+        ssl_certfile, ssl_keyfile = get_ssl_config()
+    
+    # ==================== HTTPS ZORUNLU MU? ====================
+    # Sertifika yoksa SETUP MODE (HTTP) başlat
+    use_ssl = True
     if not ssl_certfile or not ssl_keyfile:
         print("\n" + "=" * 60)
-        print("❌ HTTPS ZORUNLU - SSL SERTİFİKALARI BULUNAMADI!")
+        print("⚠️ SSL SERTİFİKALARI BULUNAMADI - KURULUM MODU")
         print("=" * 60)
-        print()
-        print("🔐 Güvenlik nedeniyle HTTP desteği kaldırılmıştır.")
-        print("   Tüm bağlantılar şifreli HTTPS üzerinden yapılmalıdır.")
-        print()
-        print("📋 Sertifika oluşturmak için:")
-        print()
-        print("   1. QuickType Pro masaüstü uygulamasını açın")
-        print("   2. Ayarlar (⚙️) → HTTPS / Security bölümüne gidin")
-        print("   3. 'HTTPS Kur' butonuna tıklayın")
-        print()
-        print("   Veya manuel olarak:")
-        print(f"   > mkcert -install")
-        print(f"   > cd certs")
-        print(f"   > mkcert localhost 127.0.0.1 {local_ip}")
-        print()
-        print("=" * 60)
-        import sys
-        sys.exit(1)
+        print("   Uygulama HTTP (Güvensiz) modunda başlatılıyor.")
+        print("   Lütfen Ayarlar -> HTTPS menüsünden sertifikaları oluşturun.")
+        print("=" * 60 + "\n")
+        use_ssl = False
     
     socket_app = create_socket_app()
     
-    # Uvicorn başlatma parametreleri - Sadece HTTPS
+    # Uvicorn yapılandırması
     uvicorn_config = {
         "host": SERVER_HOST,
         "port": SERVER_PORT,
-        "log_level": "warning",
-        "ssl_certfile": ssl_certfile,
-        "ssl_keyfile": ssl_keyfile
+        "log_level": "info",
     }
     
-    print(f"\n🔒 HTTPS modunda başlatılıyor: https://{local_ip}:{SERVER_PORT}")
-    print("   HTTP desteği devre dışı - Tüm bağlantılar şifrelidir.\n")
+    if use_ssl:
+        uvicorn_config["ssl_certfile"] = ssl_certfile
+        uvicorn_config["ssl_keyfile"] = ssl_keyfile
+        print(f"\n🔒 HTTPS modunda başlatılıyor: https://{local_ip}:{SERVER_PORT}")
+    else:
+        print(f"\n⚠️ HTTP (Setup) modunda başlatılıyor: http://{local_ip}:{SERVER_PORT}")
     
     uvicorn.run(socket_app, **uvicorn_config)
 

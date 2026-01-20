@@ -145,7 +145,7 @@ function startHeartbeat() {
         }
     }, HEARTBEAT_INTERVAL_MS);
 
-    console.log('💓 Heartbeat başlatıldı');
+    // console.log('💓 Heartbeat başlatıldı');
 }
 
 /**
@@ -155,7 +155,7 @@ function stopHeartbeat() {
     if (state.heartbeatIntervalId !== null) {
         clearInterval(state.heartbeatIntervalId);
         state.heartbeatIntervalId = null;
-        console.log('💔 Heartbeat durduruldu');
+        // console.log('💔 Heartbeat durduruldu');
     }
 }
 
@@ -366,7 +366,7 @@ export function initSocketEvents(elements, onConnected) {
  * Sayfa kapatılırken veya modül unload edilirken çağrılmalı
  */
 export function cleanup() {
-    console.log('🧹 Socket manager temizleniyor...');
+    // console.log('🧹 Socket manager temizleniyor...');
     cleanupEventHandlers();
     stopHeartbeat();
     if (cleanupVisibility) {

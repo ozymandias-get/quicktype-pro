@@ -1,6 +1,6 @@
 /**
  * QuickType Pro - Çoklu Dil Desteği (i18n) - Mobil Versiyon
- * Desteklenen diller: İngilizce, Türkçe, Almanca, Fransızca, İspanyolca
+ * Desteklenen diller: İngilizce, Türkçe
  */
 
 const translations = {
@@ -54,7 +54,30 @@ const translations = {
             download: 'Download',
 
             // Misc
-            refresh: 'Refresh'
+            refresh: 'Refresh',
+
+            // Clipboard JS Updates (New)
+            popupSent: 'Sent as popup!',
+            fileCopiedToPC: 'File path copied to PC clipboard!',
+            copiedToPC: 'Copied to PC clipboard!',
+            copyFailed: 'Copy failed',
+            uploadMaxFiles: 'You can upload max {count} files',
+            fileTooLarge: '{filename} is too large (max 50MB)',
+            fileEmpty: '{filename} is empty',
+            noConnection: 'No connection, try again',
+            uploadTimeout: 'Timeout uploading {filename}',
+            uploadFailed: '{filename} upload failed',
+            fileReadError: 'Could not read {filename}',
+            download: 'Download',
+            delete: 'Delete',
+            file: 'File',
+            fromPhone: 'From Phone',
+            fromPC: 'From PC',
+            confirmClear: '⚠️ Are you sure? (Click again)',
+            copyToPC: 'Copy to PC',
+            downloading: 'Downloading...',
+            copiedToClipboard: 'Copied to clipboard!',
+            copyToClipboardFailed: 'Could not copy to clipboard'
         }
     },
     tr: {
@@ -107,221 +130,33 @@ const translations = {
             download: 'İndir',
 
             // Misc
-            refresh: 'Yenile'
+            refresh: 'Yenile',
+
+            // Clipboard JS Updates (New)
+            popupSent: 'Pop-up olarak gönderildi!',
+            fileCopiedToPC: 'Dosya yolu PC panosuna kopyalandı!',
+            copiedToPC: 'PC panosuna kopyalandı!',
+            copyFailed: 'Kopyalama başarısız',
+            uploadMaxFiles: 'En fazla {count} dosya yükleyebilirsiniz',
+            fileTooLarge: '{filename} çok büyük (max 50MB)',
+            fileEmpty: '{filename} boş dosya',
+            noConnection: 'Bağlantı yok, tekrar deneyin',
+            uploadTimeout: '{filename} yüklenirken zaman aşımı',
+            uploadFailed: '{filename} yüklenemedi',
+            fileReadError: '{filename} okunamadı',
+            download: 'İndir',
+            delete: 'Sil',
+            file: 'Dosya',
+            fromPhone: 'Telefondan',
+            fromPC: 'PC\'den',
+            confirmClear: '⚠️ Emin misiniz? (Tıklayın)',
+            copyToPC: 'PC\'ye Kopyala',
+            downloading: 'İndiriliyor...',
+            copiedToClipboard: 'Panoya kopyalandı!',
+            copyToClipboardFailed: 'Panoya kopyalanamadı'
         }
     },
-    de: {
-        code: 'de',
-        name: 'Deutsch',
-        flag: '🇩🇪',
-        translations: {
-            // App
-            appName: 'QuickType Pro',
-            mobileControlCenter: 'Mobile Steuerzentrale',
 
-            // Status
-            status: 'Status',
-            connected: 'Verbunden',
-            disconnected: 'Getrennt',
-
-            // Keyboard view
-            keyboard: 'Tastatur',
-            clipboard: 'Zwischenablage',
-            touchHereToType: 'Hier tippen und schreiben...',
-            mouseControl: 'Maussteuerung',
-            otherKeys: 'Weitere Tasten',
-
-            // Actions
-            selectAll: 'Alles auswählen',
-            copy: 'Kopieren',
-            paste: 'Einfügen',
-            cut: 'Ausschneiden',
-            undo: 'Rückgängig',
-            redo: 'Wiederholen',
-
-            // Clipboard view
-            clipboardManagement: 'Zwischenablage',
-            twoWaySync: 'Bidirektionale Synchronisierung',
-            off: 'Aus',
-            on: 'An',
-            addTextOrPaste: 'Text hinzufügen oder einfügen...',
-            showAsPopup: 'Als Popup anzeigen',
-            saveToArchive: 'Im Archiv speichern',
-            tapToUploadFile: 'Zum Hochladen tippen',
-            imagesPdfEtc: 'Bilder, PDF, usw.',
-            fromPhone: 'Vom Telefon',
-            fromPC: 'Vom PC',
-            noItemsYet: 'Noch keine Elemente',
-            addTextOrFile: 'Text oder Datei hinzufügen',
-            clearAll: 'Alle löschen',
-
-            // Popup
-            sharedContent: 'Geteilter Inhalt',
-            download: 'Herunterladen',
-
-            // Misc
-            refresh: 'Aktualisieren'
-        }
-    },
-    fr: {
-        code: 'fr',
-        name: 'Français',
-        flag: '🇫🇷',
-        translations: {
-            // App
-            appName: 'QuickType Pro',
-            mobileControlCenter: 'Centre de contrôle mobile',
-
-            // Status
-            status: 'Statut',
-            connected: 'Connecté',
-            disconnected: 'Déconnecté',
-
-            // Keyboard view
-            keyboard: 'Clavier',
-            clipboard: 'Presse-papiers',
-            touchHereToType: 'Touchez ici pour taper...',
-            mouseControl: 'Contrôle souris',
-            otherKeys: 'Autres touches',
-
-            // Actions
-            selectAll: 'Tout sélectionner',
-            copy: 'Copier',
-            paste: 'Coller',
-            cut: 'Couper',
-            undo: 'Annuler',
-            redo: 'Rétablir',
-
-            // Clipboard view
-            clipboardManagement: 'Presse-papiers',
-            twoWaySync: 'Synchronisation bidirectionnelle',
-            off: 'Désactivé',
-            on: 'Activé',
-            addTextOrPaste: 'Ajouter du texte ou coller...',
-            showAsPopup: 'Afficher en popup',
-            saveToArchive: 'Enregistrer dans l\'archive',
-            tapToUploadFile: 'Appuyez pour télécharger',
-            imagesPdfEtc: 'Images, PDF, etc.',
-            fromPhone: 'Du téléphone',
-            fromPC: 'Du PC',
-            noItemsYet: 'Aucun élément',
-            addTextOrFile: 'Ajouter du texte ou un fichier',
-            clearAll: 'Tout effacer',
-
-            // Popup
-            sharedContent: 'Contenu partagé',
-            download: 'Télécharger',
-
-            // Misc
-            refresh: 'Actualiser'
-        }
-    },
-    es: {
-        code: 'es',
-        name: 'Español',
-        flag: '🇪🇸',
-        translations: {
-            // App
-            appName: 'QuickType Pro',
-            mobileControlCenter: 'Centro de control móvil',
-
-            // Status
-            status: 'Estado',
-            connected: 'Conectado',
-            disconnected: 'Desconectado',
-
-            // Keyboard view
-            keyboard: 'Teclado',
-            clipboard: 'Portapapeles',
-            touchHereToType: 'Toca aquí para escribir...',
-            mouseControl: 'Control del ratón',
-            otherKeys: 'Otras teclas',
-
-            // Actions
-            selectAll: 'Seleccionar todo',
-            copy: 'Copiar',
-            paste: 'Pegar',
-            cut: 'Cortar',
-            undo: 'Deshacer',
-            redo: 'Rehacer',
-
-            // Clipboard view
-            clipboardManagement: 'Portapapeles',
-            twoWaySync: 'Sincronización bidireccional',
-            off: 'Desactivado',
-            on: 'Activado',
-            addTextOrPaste: 'Agregar texto o pegar...',
-            showAsPopup: 'Mostrar como popup',
-            saveToArchive: 'Guardar en archivo',
-            tapToUploadFile: 'Toca para subir archivo',
-            imagesPdfEtc: 'Imágenes, PDF, etc.',
-            fromPhone: 'Del teléfono',
-            fromPC: 'Del PC',
-            noItemsYet: 'No hay elementos',
-            addTextOrFile: 'Agregar texto o archivo',
-            clearAll: 'Borrar todo',
-
-            // Popup
-            sharedContent: 'Contenido compartido',
-            download: 'Descargar',
-
-            // Misc
-            refresh: 'Actualizar'
-        }
-    },
-    zh: {
-        code: 'zh',
-        name: '中文',
-        flag: '🇨🇳',
-        translations: {
-            // App
-            appName: 'QuickType Pro',
-            mobileControlCenter: '移动控制中心',
-
-            // Status
-            status: '状态',
-            connected: '已连接',
-            disconnected: '已断开',
-
-            // Keyboard view
-            keyboard: '键盘',
-            clipboard: '剪贴板',
-            touchHereToType: '点击此处开始输入...',
-            mouseControl: '鼠标控制',
-            otherKeys: '其他按键',
-
-            // Actions
-            selectAll: '全选',
-            copy: '复制',
-            paste: '粘贴',
-            cut: '剪切',
-            undo: '撤销',
-            redo: '重做',
-
-            // Clipboard view
-            clipboardManagement: '剪贴板',
-            twoWaySync: '双向同步',
-            off: '关闭',
-            on: '开启',
-            addTextOrPaste: '添加文本或粘贴...',
-            showAsPopup: '显示为弹窗',
-            saveToArchive: '保存到存档',
-            tapToUploadFile: '点击上传文件',
-            imagesPdfEtc: '图片、PDF等',
-            fromPhone: '来自手机',
-            fromPC: '来自电脑',
-            noItemsYet: '暂无项目',
-            addTextOrFile: '添加文本或文件',
-            clearAll: '清除全部',
-
-            // Popup
-            sharedContent: '共享内容',
-            download: '下载',
-
-            // Misc
-            refresh: '刷新'
-        }
-    }
 };
 
 // Varsayılan dil

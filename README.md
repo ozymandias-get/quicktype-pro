@@ -13,9 +13,9 @@
 
 ---
 
-### 🌍 Languages / Diller / Sprachen
+### 🌍 Languages / Diller
 
-[🇬🇧 English](README.md) | [🇹🇷 Türkçe](README.tr.md) | [🇩🇪 Deutsch](README.de.md) | [🇫🇷 Français](README.fr.md) | [🇪🇸 Español](README.es.md) | [🇨🇳 中文](README.zh.md)
+[🇬🇧 English](README.md) | [🇹🇷 Türkçe](README.tr.md)
 
 ---
 

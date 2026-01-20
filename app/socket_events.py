@@ -434,7 +434,7 @@ async def language_change(sid: str, data: Any) -> None:
         language = data.get('language', 'en')
         
         # Desteklenen diller
-        supported_languages = ['en', 'tr', 'de', 'fr', 'es', 'zh']
+        supported_languages = ['en', 'tr']
         
         if language not in supported_languages:
             logger.warning(f"Desteklenmeyen dil: {language}")

@@ -6,6 +6,7 @@
 import { socket } from './socket-manager.js';
 import { formatFileSize, showToast, MAX_FILE_SIZE, MAX_FILES_AT_ONCE } from './utils.js';
 import { showUploadProgress, updateUploadProgress, removeUploadProgress } from './upload-progress.js';
+import { t, getLanguage } from './i18n.js';
 
 // Clipboard state
 let clipboardItems = [];
@@ -97,7 +98,7 @@ export function initClipboard(elements) {
                     content_type: 'text'
                 });
                 clipboardTextInput.value = '';
-                showToast('Pop-up olarak gönderildi!', 'success');
+                showToast(t('popupSent'), 'success');
             }
         });
     }
@@ -139,13 +140,13 @@ export function initClipboard(elements) {
             if (!confirmState) {
                 // İlk tıklama - onay moduna geç
                 confirmState = true;
-                clearAllClipboard.textContent = '⚠️ Emin misiniz? (Tıklayın)';
+                clearAllClipboard.textContent = t('confirmClear');
                 clearAllClipboard.classList.add('confirm-pending');
 
                 // 3 saniye sonra sıfırla
                 confirmTimeout = setTimeout(() => {
                     confirmState = false;
-                    clearAllClipboard.textContent = 'Tümünü Temizle';
+                    clearAllClipboard.textContent = t('clearAll');
                     clearAllClipboard.classList.remove('confirm-pending');
                 }, 3000);
             } else {
@@ -153,7 +154,7 @@ export function initClipboard(elements) {
                 clearTimeout(confirmTimeout);
                 socket.emit('clipboard_clear');
                 confirmState = false;
-                clearAllClipboard.textContent = 'Tümünü Temizle';
+                clearAllClipboard.textContent = t('clearAll');
                 clearAllClipboard.classList.remove('confirm-pending');
             }
         });
@@ -205,17 +206,17 @@ function initClipboardSocketEvents() {
     socket.on('clipboard_copied', (data) => {
         if (data.success) {
             if (data.type === 'file') {
-                showToast('Dosya yolu PC panosuna kopyalandı!', 'success');
+                showToast(t('fileCopiedToPC'), 'success');
             } else {
-                showToast('PC panosuna kopyalandı!', 'success');
+                showToast(t('copiedToPC'), 'success');
             }
         } else {
-            showToast('Kopyalama başarısız', 'error');
+            showToast(t('copyFailed'), 'error');
         }
     });
 
     socket.on('clipboard_error', (data) => {
-        showToast(data.error || 'Bir hata oluştu', 'error');
+        showToast(data.error || 'Err', 'error');
     });
 
     // Pop-up göster event'i
@@ -231,12 +232,12 @@ function updateClipboardToggle() {
     if (clipboardToggleEl && toggleLabelEl) {
         if (clipboardEnabled) {
             clipboardToggleEl.classList.add('active');
-            toggleLabelEl.textContent = 'Açık';
+            toggleLabelEl.textContent = t('on');
             toggleLabelEl.classList.remove('text-slate-400');
             toggleLabelEl.classList.add('text-emerald-400');
         } else {
             clipboardToggleEl.classList.remove('active');
-            toggleLabelEl.textContent = 'Kapalı';
+            toggleLabelEl.textContent = t('off');
             toggleLabelEl.classList.remove('text-emerald-400');
             toggleLabelEl.classList.add('text-slate-400');
         }
@@ -250,17 +251,17 @@ function handleFiles(files) {
     const fileArray = Array.from(files).slice(0, MAX_FILES_AT_ONCE);
 
     if (files.length > MAX_FILES_AT_ONCE) {
-        showToast(`En fazla ${MAX_FILES_AT_ONCE} dosya yükleyebilirsiniz`, 'error');
+        showToast(t('uploadMaxFiles').replace('{count}', MAX_FILES_AT_ONCE), 'error');
     }
 
     fileArray.forEach((file, index) => {
         if (file.size > MAX_FILE_SIZE) {
-            showToast(`${file.name} çok büyük (max 50MB)`, 'error');
+            showToast(t('fileTooLarge').replace('{filename}', file.name), 'error');
             return;
         }
 
         if (file.size === 0) {
-            showToast(`${file.name} boş dosya`, 'error');
+            showToast(t('fileEmpty').replace('{filename}', file.name), 'error');
             return;
         }
 
@@ -293,7 +294,7 @@ function uploadFileWithProgress(file, index, total) {
 
         if (!socket.connected) {
             removeUploadProgress(uploadId);
-            showToast('Bağlantı yok, tekrar deneyin', 'error');
+            showToast(t('noConnection'), 'error');
             return;
         }
 
@@ -307,7 +308,7 @@ function uploadFileWithProgress(file, index, total) {
 
         const timeout = setTimeout(() => {
             removeUploadProgress(uploadId);
-            showToast(`${file.name} yüklenirken zaman aşımı`, 'error');
+            showToast(t('uploadTimeout').replace('{filename}', file.name), 'error');
         }, 30000);
 
         const successHandler = (item) => {
@@ -322,7 +323,7 @@ function uploadFileWithProgress(file, index, total) {
         const errorHandler = (data) => {
             clearTimeout(timeout);
             removeUploadProgress(uploadId);
-            showToast(data.error || `${file.name} yüklenemedi`, 'error');
+            showToast(data.error || t('uploadFailed').replace('{filename}', file.name), 'error');
             socket.off('clipboard_error', errorHandler);
         };
 
@@ -337,7 +338,7 @@ function uploadFileWithProgress(file, index, total) {
 
     reader.onerror = () => {
         removeUploadProgress(uploadId);
-        showToast(`${file.name} okunamadı`, 'error');
+        showToast(t('fileReadError').replace('{filename}', file.name), 'error');
     };
 
     reader.readAsDataURL(file);
@@ -387,7 +388,7 @@ function createClipboardItemElement(item) {
 
     const sourceLabel = document.createElement('span');
     sourceLabel.className = 'text-xs font-medium';
-    sourceLabel.textContent = item.source === 'phone' ? 'Telefon' : 'PC';
+    sourceLabel.textContent = item.source === 'phone' ? t('fromPhone') : t('fromPC');
     sourceInfo.appendChild(sourceLabel);
 
     if (item.formatted_time) {
@@ -401,19 +402,19 @@ function createClipboardItemElement(item) {
     actions.className = 'flex items-center gap-1';
 
     if (item.content_type === 'text') {
-        const copyBtn = createActionButton('copy-btn', 'PC\'ye Kopyala', ACTION_ICONS.copy);
+        const copyBtn = createActionButton('copy-btn', t('copyToPC'), ACTION_ICONS.copy);
         copyBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             socket.emit('clipboard_copy_to_pc', { id: item.id });
         });
         actions.appendChild(copyBtn);
     } else {
-        const copyFileBtn = createActionButton('copy-file-btn', 'PC\'ye Kopyala', ACTION_ICONS.copy);
+        const copyFileBtn = createActionButton('copy-file-btn', t('copyToPC'), ACTION_ICONS.copy);
         copyFileBtn.dataset.id = item.id;
         copyFileBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             socket.emit('clipboard_copy_file_to_pc', { id: item.id });
-            showToast('Dosya PC panosuna kopyalanıyor...', 'info');
+            showToast(t('copiedToPC'), 'info');
         });
         actions.appendChild(copyFileBtn);
 
@@ -421,12 +422,12 @@ function createClipboardItemElement(item) {
         downloadLink.href = `/api/clipboard/download/${encodeURIComponent(item.id)}`;
         downloadLink.download = '';
         downloadLink.className = 'action-btn download-btn p-2 rounded-lg hover:bg-green-500/20 text-slate-400 hover:text-green-400 transition-all';
-        downloadLink.title = 'İndir';
+        downloadLink.title = t('download');
         downloadLink.innerHTML = ACTION_ICONS.download;
         actions.appendChild(downloadLink);
     }
 
-    const deleteBtn = createActionButton('delete-btn', 'Sil', ACTION_ICONS.delete, 'hover:bg-rose-500/20 text-slate-400 hover:text-rose-400');
+    const deleteBtn = createActionButton('delete-btn', t('delete'), ACTION_ICONS.delete, 'hover:bg-rose-500/20 text-slate-400 hover:text-rose-400');
     deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         socket.emit('clipboard_delete', { id: item.id });
@@ -447,15 +448,15 @@ function createClipboardItemElement(item) {
         container.addEventListener('click', async () => {
             try {
                 const response = await fetch(`/api/clipboard/content/${encodeURIComponent(item.id)}`);
-                if (!response.ok) throw new Error('İçerik alınamadı');
+                if (!response.ok) throw new Error('Err');
                 const data = await response.json();
                 if (data.content) {
                     await navigator.clipboard.writeText(data.content);
-                    showToast('Panoya kopyalandı!', 'success');
+                    showToast(t('copiedToClipboard'), 'success');
                 }
             } catch (err) {
                 console.error('Copy failed:', err);
-                showToast('Panoya kopyalanamadı', 'error');
+                showToast(t('copyToClipboardFailed'), 'error');
             }
         });
         container.style.cursor = 'pointer';
@@ -472,7 +473,7 @@ function createClipboardItemElement(item) {
 
         const nameEl = document.createElement('p');
         nameEl.className = 'text-sm text-slate-200 truncate';
-        nameEl.textContent = item.filename || 'Dosya';
+        nameEl.textContent = item.filename || t('file');
 
         const sizeEl = document.createElement('p');
         sizeEl.className = 'text-xs text-slate-500';
@@ -537,7 +538,7 @@ function initPopupModal() {
             try {
                 if (popupData.content_type === 'text') {
                     await navigator.clipboard.writeText(popupData.content);
-                    showToast('Panoya kopyalandı!', 'success');
+                    showToast(t('copiedToClipboard'), 'success');
                 } else if (popupData.content_type === 'image' && popupData.dataUrl) {
                     // Resmi kopyala
                     const response = await fetch(popupData.dataUrl);
@@ -545,11 +546,11 @@ function initPopupModal() {
                     await navigator.clipboard.write([
                         new ClipboardItem({ [blob.type]: blob })
                     ]);
-                    showToast('Resim panoya kopyalandı!', 'success');
+                    showToast(t('copiedToClipboard'), 'success');
                 } else if (popupData.content) {
                     // Fallback: metin olarak kopyala
                     await navigator.clipboard.writeText(popupData.content);
-                    showToast('Panoya kopyalandı!', 'success');
+                    showToast(t('copiedToClipboard'), 'success');
                 }
             } catch (err) {
                 console.error('Copy failed:', err);
@@ -563,9 +564,9 @@ function initPopupModal() {
                     textarea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textarea);
-                    showToast('Panoya kopyalandı!', 'success');
+                    showToast(t('copiedToClipboard'), 'success');
                 } catch (e) {
-                    showToast('Kopyalama başarısız', 'error');
+                    showToast(t('copyToClipboardFailed'), 'error');
                 }
             }
         });
@@ -582,7 +583,7 @@ function initPopupModal() {
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            showToast('İndiriliyor...', 'success');
+            showToast(t('downloading'), 'success');
         });
     }
 }
@@ -633,7 +634,7 @@ function showPopupModal(data) {
                         ? data.content
                         : `data:image/png;base64,${data.content}`;
                     img.src = dataUrl;
-                    img.alt = data.filename || 'Resim';
+                    img.alt = data.filename || t('file');
                     previewEl.appendChild(img);
                     popupData.dataUrl = dataUrl;
                 } else {
@@ -652,7 +653,7 @@ function showPopupModal(data) {
             }
 
             if (nameEl) {
-                nameEl.textContent = data.filename || 'Dosya';
+                nameEl.textContent = data.filename || t('file');
             }
 
             if (sizeEl) {

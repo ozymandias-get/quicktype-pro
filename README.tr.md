@@ -15,7 +15,7 @@
 
 ### 🌍 Diller / Languages
 
-[🇬🇧 English](README.md) | [🇹🇷 Türkçe](README.tr.md) | [🇩🇪 Deutsch](README.de.md) | [🇫🇷 Français](README.fr.md) | [🇪🇸 Español](README.es.md) | [🇨🇳 中文](README.zh.md)
+[🇬🇧 English](README.md) | [🇹🇷 Türkçe](README.tr.md)
 
 ---
 
@@ -209,17 +209,41 @@ python main.py
 │   └── sw.js                   # Service worker
 ├── 📁 electron-app/            # Desktop uygulaması
 │   ├── main.js                 # Electron giriş noktası
+│   ├── modules/                # Electron modülleri (yeni)
+│   │   ├── backend.js
+│   │   ├── https-manager.js
+│   │   ├── ipc-handlers.js
+│   │   ├── settings.js
+│   │   ├── updater.js
+│   │   └── window.js
 │   ├── preload.js              # Preload script
-│   ├── certificateManager.js   # HTTPS sertifika yönetimi
-│   ├── 📁 modules/             # Modüler mimari
-│   │   ├── settings.js         # Ayarlar yönetimi
-│   │   ├── backend.js          # Python backend kontrolü
-│   │   ├── window.js           # Pencere & tray yönetimi
-│   │   ├── updater.js          # Otomatik güncelleme sistemi
-│   │   ├── ipc-handlers.js     # IPC iletişimi
-│   │   └── https-manager.js    # HTTPS IPC handler'ları
-│   ├── 📁 src/                 # React frontend
-│   └── 📁 public/              # Statik dosyalar
+│   ├── src/
+│   │   ├── App.js              # Ana React bileşeni
+│   │   ├── constants.js        # Sabitler
+│   │   ├── components/         # UI bileşenleri
+│   │   │   ├── Settings.js       # Ayarlar paneli
+│   │   │   ├── ClipboardList.js  # Pano listesi
+│   │   │   ├── ClipboardItem.js  # Pano öğesi
+│   │   │   ├── FileUpload.js     # Dosya yükleme
+│   │   │   ├── StatusBadge.js    # Durum göstergesi
+│   │   │   ├── TextInput.js      # Metin girişi
+│   │   │   ├── settings/         # Ayar alt bileşenleri
+│   │   │   │   ├── ThemeSettings.js
+│   │   │   │   ├── StartupSettings.js
+│   │   │   │   └── ...
+│   │   │   └── layout/           # Layout bileşenleri
+│   │   │       ├── HeaderSection.js
+│   │   │       └── ...
+│   │   ├── styles/
+│   │   │   ├── main.css      # Ana stiller
+│   │   │   ├── components.css
+│   │   │   ├── clipboard.css
+│   │   │   ├── settings.css
+│   │   │   ├── utilities.css
+│   │   │   └── https.css
+│   │   └── i18n/
+│   │       └── translations.js  # Çoklu dil desteği
+│   └── public/
 ├── 📁 certs/                   # SSL sertifikaları (otomatik oluşturulur)
 ├── 📁 tests/                   # Birim testleri
 ├── 📁 uploads/                 # Paylaşılan dosya deposu
